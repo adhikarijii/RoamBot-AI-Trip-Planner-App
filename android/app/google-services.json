@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "76439392227",
+    "project_id": "roambot-e1759",
+    "storage_bucket": "roambot-e1759.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:76439392227:android:2c98dcb2d7d68ff1ef9ad6",
+        "android_client_info": {
+          "package_name": "com.example.roambot"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOaQSyFjDdKZu7n94kf_p8-xcgXKq8qt8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:76439392227:android:792e600cef2610faef9ad6",
+        "android_client_info": {
+          "package_name": "com.gbpuat.roambot"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOaQSyFjDdKZu7n94kf_p8-xcgXKq8qt8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
