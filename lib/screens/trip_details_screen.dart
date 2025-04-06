@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:roambot/widgets/custom_app_bar.dart';
-import 'package:intl/intl.dart';
 
 class TripDetailsScreen extends StatelessWidget {
   final Map<String, dynamic> trip;
@@ -9,25 +8,8 @@ class TripDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String? itinerary = trip['itinerary'];
-    final String cleanedItinerary =
-        itinerary != null
-            ? itinerary.replaceAll(RegExp(r'[#*]'), '').trim()
-            : '';
-
-    final startDate =
-        trip['startDate'] != null
-            ? (trip['startDate'] is String
-                ? trip['startDate']
-                : DateFormat('MMM d, yyyy').format(trip['startDate'].toDate()))
-            : 'N/A';
-
-    final endDate =
-        trip['endDate'] != null
-            ? (trip['endDate'] is String
-                ? trip['endDate']
-                : DateFormat('MMM d, yyyy').format(trip['endDate'].toDate()))
-            : 'N/A';
+    final String? itineraryRaw = trip['itinerary'];
+    final String itinerary = _cleanItinerary(itineraryRaw);
 
     return Scaffold(
       appBar: CustomAppBar(title: trip['destination'] ?? 'Trip Details'),
@@ -36,15 +18,18 @@ class TripDetailsScreen extends StatelessWidget {
         child: ListView(
           children: [
             Text(
-              'Destination: ${trip['destination'] ?? 'N/A'}',
+              'Destination: ${trip['destination']}',
               style: const TextStyle(fontSize: 18),
             ),
             const SizedBox(height: 8),
             Text(
-              'Start Date: $startDate',
+              'Start Date: ${trip['startDate']}',
               style: const TextStyle(fontSize: 16),
             ),
-            Text('End Date: $endDate', style: const TextStyle(fontSize: 16)),
+            Text(
+              'End Date: ${trip['endDate']}',
+              style: const TextStyle(fontSize: 16),
+            ),
             if (trip['budget'] != null)
               Text(
                 'Budget: ₹${trip['budget']}',
@@ -61,15 +46,18 @@ class TripDetailsScreen extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            cleanedItinerary.isNotEmpty
+            itinerary.isNotEmpty
                 ? Card(
-                  elevation: 2,
-                  margin: const EdgeInsets.only(top: 8),
+                  elevation: 3,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
-                      cleanedItinerary,
-                      style: const TextStyle(fontSize: 16),
+                      itinerary,
+                      style: const TextStyle(fontSize: 16, height: 1.5),
                     ),
                   ),
                 )
@@ -81,5 +69,14 @@ class TripDetailsScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _cleanItinerary(String? raw) {
+    if (raw == null || raw.isEmpty) return '';
+    return raw
+        .replaceAll(RegExp(r'Day \d+:', caseSensitive: false), '')
+        .replaceAll(RegExp(r'[#*]'), '')
+        .replaceAll(RegExp(r'\n{2,}'), '\n')
+        .trim();
   }
 }

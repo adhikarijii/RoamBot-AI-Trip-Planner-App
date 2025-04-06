@@ -3,34 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:roambot/services/gemini_services.dart';
 import 'package:roambot/utils/constants.dart';
-import 'package:roambot/widgets/custom_app_bar.dart';
 
 class TripCreationScreen extends StatefulWidget {
-  final bool isEdit;
-  final String? tripId;
-  final Map<String, dynamic>? existingTrip;
-
-  const TripCreationScreen({
-    Key? key,
-    this.isEdit = false,
-    this.tripId,
-    this.existingTrip,
-  }) : super(key: key);
+  const TripCreationScreen({Key? key}) : super(key: key);
 
   @override
   State<TripCreationScreen> createState() => _TripCreationScreenState();
 }
 
 class _TripCreationScreenState extends State<TripCreationScreen> {
-  final TextEditingController _destinationController = TextEditingController();
-  final TextEditingController _budgetController = TextEditingController();
-  final TextEditingController _peopleController = TextEditingController();
+  final _destinationController = TextEditingController();
+  final _budgetController = TextEditingController();
+  final _peopleController = TextEditingController();
   DateTime? _startDate;
   DateTime? _endDate;
   bool _isLoading = false;
 
   Future<void> _pickDate(BuildContext context, bool isStartDate) async {
-    final DateTime? picked = await showDatePicker(
+    final picked = await showDatePicker(
       context: context,
       initialDate:
           isStartDate
@@ -39,14 +29,12 @@ class _TripCreationScreenState extends State<TripCreationScreen> {
       firstDate: DateTime(2023),
       lastDate: DateTime(2100),
     );
-
     if (picked != null) {
       setState(() {
-        if (isStartDate) {
+        if (isStartDate)
           _startDate = picked;
-        } else {
+        else
           _endDate = picked;
-        }
       });
     }
   }
@@ -57,161 +45,105 @@ class _TripCreationScreenState extends State<TripCreationScreen> {
     final people = _peopleController.text.trim();
 
     if (destination.isEmpty ||
-        _startDate == null ||
-        _endDate == null ||
         budget.isEmpty ||
-        people.isEmpty) {
+        people.isEmpty ||
+        _startDate == null ||
+        _endDate == null) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Please enter all fields')));
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
+
+    final prompt =
+        "Plan a trip to $destination from ${DateFormat.yMMMd().format(_startDate!)} to ${DateFormat.yMMMd().format(_endDate!)} for $people people with a budget of ₹$budget.";
 
     try {
-      if (widget.isEdit && widget.tripId != null) {
-        // Update existing trip
-        await FirebaseFirestore.instance
-            .collection('trips')
-            .doc(widget.tripId)
-            .update({
-              'destination': destination,
-              'startDate': Timestamp.fromDate(_startDate!),
-              'endDate': Timestamp.fromDate(_endDate!),
-              'budget': budget,
-              'people': people,
-              'updatedAt': Timestamp.now(),
-            });
+      final gemini = GeminiService();
+      final itinerary = await gemini.generateTripPlan(prompt);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Trip updated successfully!')),
-        );
-      } else {
-        // Add new trip
-        final docRef = await FirebaseFirestore.instance
-            .collection('trips')
-            .add({
-              'userId': currentUserId,
-              'destination': destination,
-              'startDate': Timestamp.fromDate(_startDate!),
-              'endDate': Timestamp.fromDate(_endDate!),
-              'budget': budget,
-              'people': people,
-              'createdAt': Timestamp.now(),
-              'itinerary': '',
-            });
-
-        final prompt = '''
-      Generate a travel itinerary for a trip to $destination from ${DateFormat('MMM d, yyyy').format(_startDate!)} to ${DateFormat('MMM d, yyyy').format(_endDate!)}.
-      The trip is for $people people with a total budget of ₹$budget.
-      Keep the plan realistic, organized by day, and suggest activities and places accordingly.
-      Avoid using hashtags (#) or asterisks (*).
-      ''';
-
-        final geminiService = GeminiService();
-        final itinerary = await geminiService.generateTripPlan(prompt);
-
-        await docRef.update({'itinerary': itinerary});
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Trip and itinerary saved!')),
-        );
-      }
-
-      Navigator.pop(context); // Go back to home screen
-    } catch (e) {
-      print('❌ Error generating itinerary: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Itinerary generation failed.')),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false;
+      await FirebaseFirestore.instance.collection('trips').add({
+        'userId': currentUserId,
+        'destination': destination,
+        'startDate': _startDate,
+        'endDate': _endDate,
+        'budget': budget,
+        'people': people,
+        'itinerary': itinerary,
+        'createdAt': Timestamp.now(),
       });
-    }
-  }
 
-  @override
-  void initState() {
-    super.initState();
-    if (widget.isEdit && widget.existingTrip != null) {
-      _destinationController.text = widget.existingTrip!['destination'] ?? '';
-      _startDate = widget.existingTrip!['startDate']?.toDate();
-      _endDate = widget.existingTrip!['endDate']?.toDate();
-      _budgetController.text = widget.existingTrip!['budget']?.toString() ?? '';
-      _peopleController.text = widget.existingTrip!['people']?.toString() ?? '';
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Trip saved successfully!')));
+      Navigator.pop(context);
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Error saving trip')));
     }
+
+    setState(() => _isLoading = false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: 'Plan a Trip'),
+      appBar: AppBar(title: const Text('Plan Trip')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child:
+        padding: const EdgeInsets.all(16),
+        child: ListView(
+          children: [
+            TextField(
+              controller: _destinationController,
+              decoration: const InputDecoration(labelText: 'Destination'),
+            ),
+            TextField(
+              controller: _budgetController,
+              decoration: const InputDecoration(labelText: 'Budget'),
+              keyboardType: TextInputType.number,
+            ),
+            TextField(
+              controller: _peopleController,
+              decoration: const InputDecoration(labelText: 'Number of People'),
+              keyboardType: TextInputType.number,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: () => _pickDate(context, true),
+                    child: Text(
+                      _startDate == null
+                          ? 'Pick Start Date'
+                          : DateFormat.yMMMd().format(_startDate!),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: TextButton(
+                    onPressed: () => _pickDate(context, false),
+                    child: Text(
+                      _endDate == null
+                          ? 'Pick End Date'
+                          : DateFormat.yMMMd().format(_endDate!),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
             _isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : ListView(
-                  children: [
-                    TextField(
-                      controller: _destinationController,
-                      decoration: const InputDecoration(
-                        labelText: 'Destination',
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextButton(
-                            onPressed: () => _pickDate(context, true),
-                            child: Text(
-                              _startDate == null
-                                  ? 'Select Start Date'
-                                  : 'Start: ${DateFormat('MMM d, yyyy').format(_startDate!)}',
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: TextButton(
-                            onPressed: () => _pickDate(context, false),
-                            child: Text(
-                              _endDate == null
-                                  ? 'Select End Date'
-                                  : 'End: ${DateFormat('MMM d, yyyy').format(_endDate!)}',
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: _budgetController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Budget (in ₹)',
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: _peopleController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Number of People',
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: _saveTrip,
-                      child: const Text('Save Trip'),
-                    ),
-                  ],
+                : ElevatedButton(
+                  onPressed: _saveTrip,
+                  child: const Text('Save Trip'),
                 ),
+          ],
+        ),
       ),
     );
   }

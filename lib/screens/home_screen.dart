@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:roambot/screens/mytrip_screen.dart';
+import 'package:roambot/screens/trip_planner_screen.dart';
 import 'package:roambot/screens/trip_creation_screen.dart'; // Replace with your trip creation screen file
 
 class HomeScreen extends StatelessWidget {

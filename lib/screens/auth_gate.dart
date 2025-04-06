@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:roambot/screens/home_screen.dart';
-import 'login_screen.dart';
+import 'package:roambot/screens/login_screen.dart';
+import 'package:roambot/utils/constants.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -11,15 +12,16 @@ class AuthGate extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+        if (snapshot.connectionState == ConnectionState.active) {
+          final user = snapshot.data;
+          if (user == null) {
+            return const LoginScreen();
+          } else {
+            currentUserId = user.uid; // Important: set this here!
+            return const HomeScreen();
+          }
         }
-
-        if (snapshot.hasData) {
-          return const HomeScreen(); // Automatically open home if user logged in
-        }
-
-        return const LoginScreen(); // Else show login
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
       },
     );
   }
