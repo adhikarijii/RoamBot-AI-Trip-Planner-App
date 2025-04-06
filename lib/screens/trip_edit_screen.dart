@@ -4,22 +4,39 @@ import 'package:intl/intl.dart';
 import 'package:roambot/services/gemini_services.dart';
 import 'package:roambot/utils/constants.dart';
 
-class TripCreationScreen extends StatefulWidget {
-  const TripCreationScreen({Key? key}) : super(key: key);
+class TripEditScreen extends StatefulWidget {
+  final String tripId;
+  final Map<String, dynamic> trip;
+
+  const TripEditScreen({Key? key, required this.tripId, required this.trip})
+    : super(key: key);
 
   @override
-  State<TripCreationScreen> createState() => _TripCreationScreenState();
+  State<TripEditScreen> createState() => _TripEditScreenState();
 }
 
-class _TripCreationScreenState extends State<TripCreationScreen> {
-  final TextEditingController _destinationController = TextEditingController();
-  final TextEditingController _budgetController = TextEditingController();
-  final TextEditingController _peopleController = TextEditingController();
-
+class _TripEditScreenState extends State<TripEditScreen> {
+  late TextEditingController _destinationController;
+  late TextEditingController _budgetController;
+  late TextEditingController _peopleController;
   DateTime? _startDate;
   DateTime? _endDate;
-  String? _generatedItinerary;
+  String? _itinerary;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final trip = widget.trip;
+    _destinationController = TextEditingController(
+      text: trip['destination'] ?? '',
+    );
+    _budgetController = TextEditingController(text: trip['budget'] ?? '');
+    _peopleController = TextEditingController(text: trip['people'] ?? '');
+    _startDate = (trip['startDate'] as Timestamp).toDate();
+    _endDate = (trip['endDate'] as Timestamp).toDate();
+    _itinerary = trip['itinerary'];
+  }
 
   Future<void> _pickDate(BuildContext context, bool isStartDate) async {
     final initialDate =
@@ -28,6 +45,7 @@ class _TripCreationScreenState extends State<TripCreationScreen> {
             : (_endDate ?? (_startDate ?? DateTime.now()));
     final firstDate =
         isStartDate ? DateTime.now() : (_startDate ?? DateTime.now());
+
     final picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
@@ -48,7 +66,11 @@ class _TripCreationScreenState extends State<TripCreationScreen> {
     }
   }
 
-  Future<void> _generateAndSaveTrip() async {
+  String sanitizeItinerary(String itinerary) {
+    return itinerary.replaceAll(RegExp(r'[#*•]'), '').trim();
+  }
+
+  Future<void> _generateAndSaveItinerary() async {
     final destination = _destinationController.text.trim();
     final budget = _budgetController.text.trim();
     final people = _peopleController.text.trim();
@@ -72,15 +94,14 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
 ''';
 
     try {
-      final itinerary = await GeminiService().generateTripPlan(prompt);
-
-      // Clean unwanted symbols
-      final cleanedItinerary = itinerary.replaceAll(RegExp(r'[#*`_~>-]'), '');
+      final rawItinerary = await GeminiService().generateTripPlan(prompt);
+      final cleanedItinerary = sanitizeItinerary(rawItinerary);
 
       setState(() {
-        _generatedItinerary = cleanedItinerary;
+        _itinerary = cleanedItinerary;
         _isLoading = false;
       });
+
       _showItineraryPreviewDialog(cleanedItinerary);
     } catch (e) {
       setState(() => _isLoading = false);
@@ -91,7 +112,7 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
     }
   }
 
-  Future<void> _showItineraryPreviewDialog(String itinerary) async {
+  void _showItineraryPreviewDialog(String itinerary) {
     showDialog(
       context: context,
       builder:
@@ -106,39 +127,40 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  _saveTrip();
+                  _saveUpdatedTrip();
                 },
-                child: const Text('Save Trip'),
+                child: const Text('Save Changes'),
               ),
             ],
           ),
     );
   }
 
-  Future<void> _saveTrip() async {
+  Future<void> _saveUpdatedTrip() async {
     try {
-      await FirebaseFirestore.instance.collection('trips').add({
-        'userId': currentUserId,
-        'destination': _destinationController.text.trim(),
-        'startDate': Timestamp.fromDate(_startDate!),
-        'endDate': Timestamp.fromDate(_endDate!),
-        'budget': _budgetController.text.trim(),
-        'people': _peopleController.text.trim(),
-        'createdAt': Timestamp.now(),
-        'itinerary': _generatedItinerary ?? '',
-      });
+      await FirebaseFirestore.instance
+          .collection('trips')
+          .doc(widget.tripId)
+          .update({
+            'destination': _destinationController.text.trim(),
+            'startDate': Timestamp.fromDate(_startDate!),
+            'endDate': Timestamp.fromDate(_endDate!),
+            'budget': _budgetController.text.trim(),
+            'people': _peopleController.text.trim(),
+            'itinerary': _itinerary ?? '',
+          });
 
       showDialog(
         context: context,
         builder:
             (_) => AlertDialog(
               title: const Text('Success'),
-              content: const Text('Trip has been saved successfully!'),
+              content: const Text('Trip updated successfully!'),
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    Navigator.pop(context);
+                    Navigator.pop(context); // Pop edit screen
                   },
                   child: const Text('OK'),
                 ),
@@ -146,10 +168,10 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
             ),
       );
     } catch (e) {
-      print('Error saving trip: $e');
+      print('Error updating trip: $e');
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to save trip')));
+      ).showSnackBar(const SnackBar(content: Text('Failed to update trip')));
     }
   }
 
@@ -157,7 +179,7 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Plan a Trip'),
+        title: const Text('Edit Trip'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -235,9 +257,9 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
-                      icon: const Icon(Icons.flight_takeoff),
-                      label: const Text('Plan Trip'),
-                      onPressed: _generateAndSaveTrip,
+                      icon: const Icon(Icons.replay_outlined),
+                      label: const Text('Regenerate Itinerary'),
+                      onPressed: _generateAndSaveItinerary,
                     ),
                   ],
                 ),
