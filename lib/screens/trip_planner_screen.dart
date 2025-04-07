@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:roambot/screens/trip_details_screen.dart';
 import 'package:roambot/screens/trip_edit_screen.dart';
 import 'package:roambot/utils/constants.dart';
-import 'package:roambot/widgets/custom_app_bar.dart';
+import 'package:roambot/commons/widgets/custom_app_bar.dart';
 
 class TripPlannerScreen extends StatefulWidget {
   const TripPlannerScreen({super.key});

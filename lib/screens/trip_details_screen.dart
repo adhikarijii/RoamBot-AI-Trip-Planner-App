@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:roambot/widgets/custom_app_bar.dart';
+import 'package:roambot/commons/widgets/custom_app_bar.dart';
 
 class TripDetailsScreen extends StatelessWidget {
   final Map<String, dynamic> trip;

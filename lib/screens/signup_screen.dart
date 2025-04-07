@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:roambot/commons/widgets/customElevatedButtons.dart';
 import 'package:roambot/utils/constants.dart';
-import 'package:roambot/widgets/custom_app_bar.dart';
+import 'package:roambot/commons/widgets/custom_app_bar.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -48,7 +49,12 @@ class _SignupScreenState extends State<SignupScreen> {
               obscureText: true,
             ),
             SizedBox(height: 20),
-            ElevatedButton(onPressed: signup, child: Text("Sign Up")),
+            customButtons(
+              bcolor: const Color(0xFF3B86F5),
+              child: 'Sign Up',
+              fcolor: Colors.white,
+              onPressed: signup,
+            ),
           ],
         ),
       ),

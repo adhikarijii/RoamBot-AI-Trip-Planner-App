@@ -18,8 +18,15 @@ class MyApp extends StatelessWidget {
       title: 'RoamBot',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(255, 49, 248, 185),
+        ),
+        fontFamily: 'Outfit',
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
+          bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+        ),
       ),
       home: const AuthGate(),
     );

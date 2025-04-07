@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:roambot/commons/widgets/customElevatedButtons.dart';
 import 'package:roambot/services/gemini_services.dart';
-import 'package:roambot/widgets/custom_app_bar.dart';
+import 'package:roambot/commons/widgets/custom_app_bar.dart';
 
 class TripEditScreen extends StatefulWidget {
   final String tripId;
@@ -124,12 +125,14 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
                 onPressed: () => Navigator.pop(context),
                 child: const Text('Edit'),
               ),
-              ElevatedButton(
+              customButtons(
+                bcolor: const Color(0xFF3B86F5),
+                child: 'Save Changes',
+                fcolor: Colors.white,
                 onPressed: () {
                   Navigator.pop(context);
                   _saveUpdatedTrip();
                 },
-                child: const Text('Save Changes'),
               ),
             ],
           ),
