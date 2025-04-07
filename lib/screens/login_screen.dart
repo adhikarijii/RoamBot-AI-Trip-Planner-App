@@ -22,6 +22,8 @@ class _LoginScreenState extends State<LoginScreen> {
             password: passwordController.text.trim(),
           );
       currentUserId = userCredential.user!.uid;
+
+      // No manual navigation here – AuthGate will rebuild to HomeScreen
     } catch (e) {
       ScaffoldMessenger.of(
         context,
@@ -32,29 +34,29 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Login')),
+      appBar: AppBar(title: const Text('Login')),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             TextField(
               controller: emailController,
-              decoration: InputDecoration(labelText: "Email"),
+              decoration: const InputDecoration(labelText: "Email"),
             ),
             TextField(
               controller: passwordController,
-              decoration: InputDecoration(labelText: "Password"),
+              decoration: const InputDecoration(labelText: "Password"),
               obscureText: true,
             ),
-            SizedBox(height: 20),
-            ElevatedButton(onPressed: login, child: Text("Login")),
+            const SizedBox(height: 20),
+            ElevatedButton(onPressed: login, child: const Text("Login")),
             TextButton(
               onPressed:
                   () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => SignupScreen()),
+                    MaterialPageRoute(builder: (_) => const SignupScreen()),
                   ),
-              child: Text("Don't have an account? Sign up"),
+              child: const Text("Don't have an account? Sign up"),
             ),
           ],
         ),

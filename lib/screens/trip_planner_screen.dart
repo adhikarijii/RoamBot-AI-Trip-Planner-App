@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:roambot/screens/trip_details_screen.dart';
 import 'package:roambot/screens/trip_edit_screen.dart';
 import 'package:roambot/utils/constants.dart';
+import 'package:roambot/widgets/custom_app_bar.dart';
 
 class TripPlannerScreen extends StatefulWidget {
   const TripPlannerScreen({super.key});
@@ -42,18 +43,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Trips'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await auth.signOut();
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-          ),
-        ],
-      ),
+      appBar: CustomAppBar(title: ('My Trips')),
       body: Column(
         children: [
           Padding(
@@ -108,53 +98,80 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                     final dateRange =
                         '${DateFormat('MMM d').format(startDate)} - ${DateFormat('MMM d, yyyy').format(endDate)}';
 
-                    return Card(
-                      elevation: 4,
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      child: ListTile(
-                        title: Text(
-                          data['destination'] ?? '',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Dates: $dateRange'),
-                            Text('Budget: ₹${data['budget']}'),
-                            Text('People: ${data['people']}'),
-                          ],
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit, color: Colors.blue),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (_) => TripEditScreen(
-                                          tripId: doc.id,
-                                          trip: data,
-                                        ),
-                                  ),
-                                );
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _confirmDelete(context, doc.id),
+                    return Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: AnimatedContainer(
+                        duration: Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        padding: const EdgeInsets.all(1),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.grey.withOpacity(0.5),
+                            width: 1,
+                          ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 5,
+                              spreadRadius: 1,
+                              offset: Offset(0, 3),
                             ),
                           ],
                         ),
-                        onTap:
-                            () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => TripDetailsScreen(trip: data),
+                        child: ListTile(
+                          title: Text(
+                            data['destination'] ?? '',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Dates: $dateRange'),
+                              Text('Budget: ₹${data['budget']}'),
+                              Text('People: ${data['people']}'),
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.edit,
+                                  color: Colors.blue,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (_) => TripEditScreen(
+                                            tripId: doc.id,
+                                            trip: data,
+                                          ),
+                                    ),
+                                  );
+                                },
                               ),
-                            ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
+                                onPressed:
+                                    () => _confirmDelete(context, doc.id),
+                              ),
+                            ],
+                          ),
+                          onTap:
+                              () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => TripDetailsScreen(trip: data),
+                                ),
+                              ),
+                        ),
                       ),
                     );
                   },

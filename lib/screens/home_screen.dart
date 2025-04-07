@@ -1,28 +1,15 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:roambot/screens/trip_planner_screen.dart';
-import 'package:roambot/screens/trip_creation_screen.dart'; // Replace with your trip creation screen file
+import 'package:roambot/screens/trip_creation_screen.dart';
+import 'package:roambot/widgets/custom_app_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
-  void _logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-    Navigator.of(context).pushReplacementNamed('/login');
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('RoamBot Home'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => _logout(context),
-          ),
-        ],
-      ),
+      appBar: CustomAppBar(title: ('RoamBot Home')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

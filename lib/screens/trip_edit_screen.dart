@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:roambot/services/gemini_services.dart';
-import 'package:roambot/utils/constants.dart';
+import 'package:roambot/widgets/custom_app_bar.dart';
 
 class TripEditScreen extends StatefulWidget {
   final String tripId;
@@ -178,18 +178,7 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Trip'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await auth.signOut();
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-          ),
-        ],
-      ),
+      appBar: CustomAppBar(title: ('Edit Trip')),
       body:
           _isLoading
               ? const Center(child: CircularProgressIndicator())

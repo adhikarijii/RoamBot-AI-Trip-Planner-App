@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:roambot/widgets/custom_app_bar.dart';
 
 class TripDetailsScreen extends StatelessWidget {
   final Map<String, dynamic> trip;
@@ -64,17 +65,7 @@ class TripDetailsScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Trip Details'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-          ),
-        ],
-      ),
+      appBar: CustomAppBar(title: ('Trip Details')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView(

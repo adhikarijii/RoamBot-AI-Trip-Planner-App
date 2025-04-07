@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:roambot/services/gemini_services.dart';
 import 'package:roambot/utils/constants.dart';
+import 'package:roambot/widgets/custom_app_bar.dart';
 
 class TripCreationScreen extends StatefulWidget {
   const TripCreationScreen({Key? key}) : super(key: key);
@@ -156,18 +157,7 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Plan a Trip'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await auth.signOut();
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-          ),
-        ],
-      ),
+      appBar: CustomAppBar(title: ('Plan a Trip')),
       body:
           _isLoading
               ? const Center(child: CircularProgressIndicator())
@@ -221,7 +211,7 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                         labelText: 'Budget (₹)',
-                        prefixIcon: Icon(Icons.attach_money),
+                        prefixIcon: Icon(Icons.currency_rupee),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -235,7 +225,7 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
-                      icon: const Icon(Icons.flight_takeoff),
+                      icon: const Icon(Icons.flight_takeoff_sharp),
                       label: const Text('Plan Trip'),
                       onPressed: _generateAndSaveTrip,
                     ),
