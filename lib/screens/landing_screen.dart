@@ -13,13 +13,12 @@ class LandingScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Top Bar: Logo and Sign In
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
-                      Image.asset('assets/icon/app_icon.png', height: 30),
+                      Image.asset('assets/icon/app_icon.png', height: 50),
                       const SizedBox(width: 8),
                       const Text(
                         'RoamBot',
@@ -45,14 +44,17 @@ class LandingScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              // Headline
               RichText(
                 textAlign: TextAlign.center,
                 text: const TextSpan(
                   children: [
                     TextSpan(
                       text: 'Discover Your Next Adventure with ',
-                      style: TextStyle(color: Colors.black, fontSize: 24),
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     TextSpan(
                       text: 'AI',
@@ -64,11 +66,7 @@ class LandingScreen extends StatelessWidget {
                     ),
                     TextSpan(
                       text: ': Personalized Itineraries at Your Fingertips',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(color: Colors.black, fontSize: 24),
                     ),
                   ],
                 ),
