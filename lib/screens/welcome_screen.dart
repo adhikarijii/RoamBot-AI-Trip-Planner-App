@@ -20,8 +20,8 @@ class WelcomeScreen extends StatelessWidget {
                     TextSpan(
                       text: 'Welcome ',
                       style: TextStyle(
-                        color: Color.fromARGB(255, 255, 255, 255),
-                        fontSize: 24,
+                        color: Color.fromARGB(255, 0, 140, 221),
+                        fontSize: 30,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -46,7 +46,7 @@ class WelcomeScreen extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   side: BorderSide(
                     width: 3.0,
-                    color: const Color.fromARGB(255, 255, 255, 255),
+                    color: const Color.fromARGB(255, 0, 140, 221),
                   ),
                   backgroundColor: Colors.black,
                   padding: const EdgeInsets.symmetric(

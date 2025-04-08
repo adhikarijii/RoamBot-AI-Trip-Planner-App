@@ -95,21 +95,30 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
   Future<void> _showItineraryPreviewDialog(String itinerary) async {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder:
           (_) => AlertDialog(
+            insetPadding: EdgeInsets.all(5),
             title: const Text('Itinerary Preview'),
             content: SingleChildScrollView(child: Text(itinerary)),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Edit'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _saveTrip();
-                },
-                child: const Text('Save Trip'),
+              Center(
+                child: Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Edit'),
+                    ),
+                    const SizedBox(width: 30),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _saveTrip();
+                      },
+                      child: const Text('Save Trip'),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

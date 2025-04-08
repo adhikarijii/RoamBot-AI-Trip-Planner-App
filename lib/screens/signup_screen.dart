@@ -50,6 +50,10 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
             SizedBox(height: 20),
             customButtons(
+              side: BorderSide(
+                width: 3.0,
+                color: const Color.fromARGB(255, 0, 140, 221),
+              ),
               bcolor: const Color(0xFF3B86F5),
               child: 'Sign Up',
               fcolor: Colors.white,

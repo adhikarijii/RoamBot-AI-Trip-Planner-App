@@ -126,6 +126,10 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
                 child: const Text('Edit'),
               ),
               customButtons(
+                side: BorderSide(
+                  width: 3.0,
+                  color: const Color.fromARGB(255, 0, 140, 221),
+                ),
                 bcolor: const Color(0xFF3B86F5),
                 child: 'Save Changes',
                 fcolor: Colors.white,

@@ -27,10 +27,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       rememberMe = prefs.getBool('remember_me') ?? false;
-      emailController.text =
-          prefs.getString('saved_email') ?? 'dev@example.com';
-      passwordController.text =
-          prefs.getString('saved_password') ?? 'devpassword';
+      emailController.text = prefs.getString('saved_email') ?? '';
+      passwordController.text = prefs.getString('saved_password') ?? '';
     });
   }
 
@@ -96,6 +94,10 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 20),
             customButtons(
+              side: BorderSide(
+                width: 3.0,
+                color: const Color.fromARGB(255, 0, 140, 221),
+              ),
               bcolor: const Color(0xFF3B86F5),
               child: 'Login',
               fcolor: Colors.white,

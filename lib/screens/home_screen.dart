@@ -90,7 +90,11 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             customButtons(
-              bcolor: const Color.fromARGB(255, 231, 231, 86),
+              side: BorderSide(
+                width: 3.0,
+                color: const Color.fromARGB(255, 0, 0, 0),
+              ),
+              bcolor: Colors.white,
               child: 'Profile',
               fcolor: Colors.black,
               onPressed: () {
@@ -102,7 +106,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 20),
             customButtons(
-              bcolor: const Color.fromARGB(255, 134, 252, 75),
+              side: BorderSide(width: 3.0, color: Colors.green),
+              bcolor: const Color.fromARGB(255, 255, 255, 255),
               child: 'Plan Trip',
               fcolor: Colors.black,
               onPressed: () {
@@ -114,7 +119,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 20),
             customButtons(
-              bcolor: const Color.fromARGB(255, 52, 248, 255),
+              side: BorderSide(
+                width: 3.0,
+                color: const Color.fromARGB(255, 0, 140, 221),
+              ),
+              bcolor: Colors.white,
               child: 'My Trips',
               fcolor: Colors.black,
               onPressed: () {

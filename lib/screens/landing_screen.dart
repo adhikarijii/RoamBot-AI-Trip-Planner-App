@@ -25,7 +25,7 @@ class LandingScreen extends StatelessWidget {
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                        // fontWeight: FontWeight.bold,
                       ),
                     ),
                     TextSpan(
@@ -44,7 +44,7 @@ class LandingScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
               // Subheading
               const Text(
@@ -53,7 +53,7 @@ class LandingScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 14, color: Colors.black54),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
 
               // CTA Button
               ElevatedButton(
@@ -76,14 +76,14 @@ class LandingScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
 
               // App Mockup
               Center(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: Image.asset(
-                    'assets/icon/landing.png',
+                    'assets/icon/landing1.png',
                     height: 400,
                     fit: BoxFit.contain,
                   ),
