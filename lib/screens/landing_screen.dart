@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:roambot/screens/welcome_screen.dart';
 
 class LandingScreen extends StatelessWidget {
   const LandingScreen({super.key});
@@ -8,42 +9,13 @@ class LandingScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        child: Padding(
+          padding: const EdgeInsets.all(9.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Image.asset('assets/icon/app_icon.png', height: 50),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'RoamBot',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/auth');
-                    },
-                    style: TextButton.styleFrom(backgroundColor: Colors.black),
-                    child: const Text(
-                      'Sign In',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 40),
-
+              const SizedBox(height: 50),
+              // Headline
               RichText(
                 textAlign: TextAlign.center,
                 text: const TextSpan(
@@ -93,7 +65,10 @@ class LandingScreen extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/auth');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+                  );
                 },
                 child: const Text(
                   'Get Started, It’s Free',
@@ -101,7 +76,7 @@ class LandingScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
 
               // App Mockup
               Center(
