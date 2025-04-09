@@ -44,31 +44,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
-  Future<void> _saveProfile() async {
-    setState(() => _isLoading = true);
-
-    String? imageUrl;
-
-    if (_imageFile != null) {
-      final ref = FirebaseStorage.instance.ref().child(
-        'profile_pics/$userId.jpg',
-      );
-      await ref.putFile(_imageFile!);
-      imageUrl = await ref.getDownloadURL();
-    }
-
-    await FirebaseFirestore.instance.collection('users').doc(userId).set({
-      'name': nameController.text.trim(),
-      if (imageUrl != null) 'profileImage': imageUrl,
-    }, SetOptions(merge: true));
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Profile updated!")));
-
-    setState(() => _isLoading = false);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,7 +55,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             GestureDetector(
               onTap: _pickImage,
               child: CircleAvatar(
-                radius: 50,
+                radius: 30,
                 backgroundImage:
                     _imageFile != null ? FileImage(_imageFile!) : null,
                 child:
@@ -90,17 +65,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
-            ),
-            const SizedBox(height: 20),
-            _isLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                  onPressed: _saveProfile,
-                  child: const Text("Save Profile"),
-                ),
           ],
         ),
       ),

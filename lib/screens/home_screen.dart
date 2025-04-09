@@ -88,22 +88,6 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // customButtons(
-            //   side: BorderSide(
-            //     width: 3.0,
-            //     color: const Color.fromARGB(255, 0, 0, 0),
-            //   ),
-            //   bcolor: Colors.white,
-            //   child: 'Profile',
-            //   fcolor: Colors.black,
-            //   onPressed: () {
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(builder: (_) => const ProfileScreen()),
-            //     );
-            //   },
-            // ),
-            // const SizedBox(height: 20),
             customButtons(
               side: BorderSide(width: 3.0, color: Colors.green),
               bcolor: const Color.fromARGB(255, 255, 255, 255),
