@@ -19,24 +19,38 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   Future<void> _confirmDelete(BuildContext context, String tripId) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
-      builder:
-          (_) => AlertDialog(
-            title: const Text('Delete Trip'),
-            content: const Text('Are you sure you want to delete this trip?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Delete'),
-              ),
-            ],
-          ),
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete Trip'),
+          content: const Text('Are you sure you want to delete this trip?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(false); // Cancel
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(true); // Confirm delete
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
     );
+
     if (shouldDelete == true) {
       await FirebaseFirestore.instance.collection('trips').doc(tripId).delete();
+
+      // Optional: show a Snackbar after deletion
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Trip deleted successfully')),
+        );
+      }
     }
   }
 

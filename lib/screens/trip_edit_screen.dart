@@ -1,16 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:roambot/commons/widgets/custom_elevated_buttons.dart';
 import 'package:roambot/services/gemini_services.dart';
+import 'package:roambot/utils/constants.dart';
 import 'package:roambot/commons/widgets/custom_app_bar.dart';
 
 class TripEditScreen extends StatefulWidget {
   final String tripId;
   final Map<String, dynamic> trip;
 
-  const TripEditScreen({Key? key, required this.tripId, required this.trip})
-    : super(key: key);
+  const TripEditScreen({super.key, required this.tripId, required this.trip});
 
   @override
   State<TripEditScreen> createState() => _TripEditScreenState();
@@ -28,25 +27,19 @@ class _TripEditScreenState extends State<TripEditScreen> {
   @override
   void initState() {
     super.initState();
-    final trip = widget.trip;
     _destinationController = TextEditingController(
-      text: trip['destination'] ?? '',
+      text: widget.trip['destination'],
     );
-    _budgetController = TextEditingController(text: trip['budget'] ?? '');
-    _peopleController = TextEditingController(text: trip['people'] ?? '');
-    _startDate = (trip['startDate'] as Timestamp).toDate();
-    _endDate = (trip['endDate'] as Timestamp).toDate();
-    _itinerary = trip['itinerary'];
+    _budgetController = TextEditingController(text: widget.trip['budget']);
+    _peopleController = TextEditingController(text: widget.trip['people']);
+    _startDate = (widget.trip['startDate'] as Timestamp).toDate();
+    _endDate = (widget.trip['endDate'] as Timestamp).toDate();
+    _itinerary = widget.trip['itinerary'];
   }
 
-  Future<void> _pickDate(BuildContext context, bool isStartDate) async {
-    final initialDate =
-        isStartDate
-            ? (_startDate ?? DateTime.now())
-            : (_endDate ?? (_startDate ?? DateTime.now()));
-    final firstDate =
-        isStartDate ? DateTime.now() : (_startDate ?? DateTime.now());
-
+  Future<void> _pickDate(BuildContext context, bool isStart) async {
+    final initialDate = isStart ? _startDate! : _endDate!;
+    final firstDate = isStart ? DateTime.now() : _startDate!;
     final picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
@@ -55,7 +48,7 @@ class _TripEditScreenState extends State<TripEditScreen> {
     );
     if (picked != null) {
       setState(() {
-        if (isStartDate) {
+        if (isStart) {
           _startDate = picked;
           if (_endDate != null && _endDate!.isBefore(picked)) {
             _endDate = null;
@@ -67,20 +60,16 @@ class _TripEditScreenState extends State<TripEditScreen> {
     }
   }
 
-  String sanitizeItinerary(String itinerary) {
-    return itinerary.replaceAll(RegExp(r'[#*•]'), '').trim();
-  }
-
-  Future<void> _generateAndSaveItinerary() async {
+  Future<void> _regenerateItinerary() async {
     final destination = _destinationController.text.trim();
     final budget = _budgetController.text.trim();
     final people = _peopleController.text.trim();
 
     if (destination.isEmpty ||
-        _startDate == null ||
-        _endDate == null ||
         budget.isEmpty ||
-        people.isEmpty) {
+        people.isEmpty ||
+        _startDate == null ||
+        _endDate == null) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
@@ -90,23 +79,22 @@ class _TripEditScreenState extends State<TripEditScreen> {
     setState(() => _isLoading = true);
 
     final prompt = '''
-Create a detailed itinerary for a trip to $destination from ${DateFormat('MMMM d, yyyy').format(_startDate!)} to ${DateFormat('MMMM d, yyyy').format(_endDate!)}.
+Regenerate a detailed itinerary for a trip to $destination from ${DateFormat('MMMM d, yyyy').format(_startDate!)} to ${DateFormat('MMMM d, yyyy').format(_endDate!)}.
 The budget is ₹$budget and number of people going is $people. Break the itinerary day-wise and include places to visit, activities, and estimated time.
 ''';
 
     try {
-      final rawItinerary = await GeminiService().generateTripPlan(prompt);
-      final cleanedItinerary = sanitizeItinerary(rawItinerary);
+      final response = await GeminiService().generateTripPlan(prompt);
+      final cleaned = response.replaceAll(RegExp(r'[#*`_~>-]'), '');
 
       setState(() {
-        _itinerary = cleanedItinerary;
+        _itinerary = cleaned;
         _isLoading = false;
       });
 
-      _showItineraryPreviewDialog(cleanedItinerary);
+      _showItineraryPreviewDialog(cleaned);
     } catch (e) {
       setState(() => _isLoading = false);
-      print("Itinerary generation error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to generate itinerary')),
       );
@@ -116,34 +104,30 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
   void _showItineraryPreviewDialog(String itinerary) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder:
-          (_) => AlertDialog(
-            title: const Text('Itinerary Preview'),
+          (dialogContext) => AlertDialog(
+            insetPadding: const EdgeInsets.all(10),
+            title: const Text('Preview New Itinerary'),
             content: SingleChildScrollView(child: Text(itinerary)),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.of(dialogContext).pop(),
                 child: const Text('Edit'),
               ),
-              customButtons(
-                side: BorderSide(
-                  width: 3.0,
-                  color: const Color.fromARGB(255, 0, 140, 221),
-                ),
-                bcolor: const Color(0xFF3B86F5),
-                child: 'Save Changes',
-                fcolor: Colors.white,
-                onPressed: () {
-                  Navigator.pop(context);
-                  _saveUpdatedTrip();
+              ElevatedButton(
+                onPressed: () async {
+                  Navigator.of(dialogContext).pop();
+                  await _saveChanges();
                 },
+                child: const Text('Save Changes'),
               ),
             ],
           ),
     );
   }
 
-  Future<void> _saveUpdatedTrip() async {
+  Future<void> _saveChanges() async {
     try {
       await FirebaseFirestore.instance
           .collection('trips')
@@ -157,17 +141,19 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
             'itinerary': _itinerary ?? '',
           });
 
+      if (!mounted) return;
       showDialog(
         context: context,
+        barrierDismissible: false,
         builder:
-            (_) => AlertDialog(
+            (dialogContext) => AlertDialog(
               title: const Text('Success'),
               content: const Text('Trip updated successfully!'),
               actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context); // Pop edit screen
+                    Navigator.of(dialogContext).pop();
+                    Navigator.of(context).pop();
                   },
                   child: const Text('OK'),
                 ),
@@ -175,17 +161,17 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
             ),
       );
     } catch (e) {
-      print('Error updating trip: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to update trip')));
+      ).showSnackBar(const SnackBar(content: Text('Failed to save changes')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: ('Edit Trip')),
+      appBar: CustomAppBar(title: 'Edit Trip'),
       body:
           _isLoading
               ? const Center(child: CircularProgressIndicator())
@@ -205,11 +191,11 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
                       children: [
                         Expanded(
                           child: TextButton.icon(
-                            onPressed: () => _pickDate(context, true),
                             icon: const Icon(Icons.date_range),
+                            onPressed: () => _pickDate(context, true),
                             label: Text(
                               _startDate == null
-                                  ? 'Select Start Date'
+                                  ? 'Start Date'
                                   : DateFormat(
                                     'MMM d, yyyy',
                                   ).format(_startDate!),
@@ -219,14 +205,14 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
                         const SizedBox(width: 8),
                         Expanded(
                           child: TextButton.icon(
+                            icon: const Icon(Icons.date_range_outlined),
                             onPressed:
                                 _startDate == null
                                     ? null
                                     : () => _pickDate(context, false),
-                            icon: const Icon(Icons.date_range_outlined),
                             label: Text(
                               _endDate == null
-                                  ? 'Select End Date'
+                                  ? 'End Date'
                                   : DateFormat('MMM d, yyyy').format(_endDate!),
                             ),
                           ),
@@ -239,7 +225,7 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                         labelText: 'Budget (₹)',
-                        prefixIcon: Icon(Icons.attach_money),
+                        prefixIcon: Icon(Icons.currency_rupee),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -247,15 +233,15 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
                       controller: _peopleController,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
-                        labelText: 'Number of People',
+                        labelText: 'People',
                         prefixIcon: Icon(Icons.people),
                       ),
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
-                      icon: const Icon(Icons.replay_outlined),
+                      icon: const Icon(Icons.auto_fix_high),
                       label: const Text('Regenerate Itinerary'),
-                      onPressed: _generateAndSaveItinerary,
+                      onPressed: _regenerateItinerary,
                     ),
                   ],
                 ),

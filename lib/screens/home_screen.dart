@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
       final data = doc.data();
       if (data != null) {
         setState(() {
-          name = data['name'] ?? '';
+          name = data['name'] ?? 'Traveler';
           photoUrl = data['photoUrl'];
         });
       }
@@ -51,10 +51,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final avatar =
+        photoUrl != null
+            ? NetworkImage(photoUrl!)
+            : const AssetImage('assets/default_avatar.png') as ImageProvider;
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Welcome${name != null && name!.isNotEmpty ? ', $name!' : '!'}',
+          'Welcome, ${name ?? 'Traveler'}!',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.black,
@@ -69,14 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: CircleAvatar(
-                radius: 18,
-                backgroundImage:
-                    photoUrl != null
-                        ? NetworkImage(photoUrl!)
-                        : const AssetImage('assets/default_avatar.png')
-                            as ImageProvider,
-              ),
+              child: CircleAvatar(radius: 18, backgroundImage: avatar),
             ),
           ),
           IconButton(
@@ -91,22 +88,22 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            customButtons(
-              side: BorderSide(
-                width: 3.0,
-                color: const Color.fromARGB(255, 0, 0, 0),
-              ),
-              bcolor: Colors.white,
-              child: 'Profile',
-              fcolor: Colors.black,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const UserProfileScreen()),
-                );
-              },
-            ),
-            const SizedBox(height: 20),
+            // customButtons(
+            //   side: BorderSide(
+            //     width: 3.0,
+            //     color: const Color.fromARGB(255, 0, 0, 0),
+            //   ),
+            //   bcolor: Colors.white,
+            //   child: 'Profile',
+            //   fcolor: Colors.black,
+            //   onPressed: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            //     );
+            //   },
+            // ),
+            // const SizedBox(height: 20),
             customButtons(
               side: BorderSide(width: 3.0, color: Colors.green),
               bcolor: const Color.fromARGB(255, 255, 255, 255),

@@ -76,7 +76,7 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
       final itinerary = await GeminiService().generateTripPlan(prompt);
 
       // Clean unwanted symbols
-      final cleanedItinerary = itinerary.replaceAll(RegExp(r'[#*`_~>-]'), '');
+      final cleanedItinerary = itinerary.replaceAll(RegExp(r'[#*`_]'), '');
 
       setState(() {
         _generatedItinerary = cleanedItinerary;
@@ -97,28 +97,28 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
       context: context,
       barrierDismissible: false,
       builder:
-          (_) => AlertDialog(
-            insetPadding: EdgeInsets.all(5),
+          (context) => AlertDialog(
+            insetPadding: const EdgeInsets.all(10),
             title: const Text('Itinerary Preview'),
-            content: SingleChildScrollView(child: Text(itinerary)),
+            content: SizedBox(
+              height: MediaQuery.of(context).size.height * 0.5,
+              width: double.maxFinite,
+              child: SingleChildScrollView(child: Text(itinerary)),
+            ),
+            actionsAlignment: MainAxisAlignment.spaceBetween,
             actions: [
-              Center(
-                child: Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Edit'),
-                    ),
-                    const SizedBox(width: 30),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        _saveTrip();
-                      },
-                      child: const Text('Save Trip'),
-                    ),
-                  ],
-                ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Edit'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _saveTrip();
+                },
+                child: const Text('Save Trip'),
               ),
             ],
           ),
@@ -138,28 +138,33 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
         'itinerary': _generatedItinerary ?? '',
       });
 
-      showDialog(
-        context: context,
-        builder:
-            (_) => AlertDialog(
-              title: const Text('Success'),
-              content: const Text('Trip has been saved successfully!'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-      );
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder:
+              (ctx) => AlertDialog(
+                title: const Text('Success'),
+                content: const Text('Trip has been saved successfully!'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                      Navigator.of(context).pop(); // Pop TripCreationScreen
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+        );
+      }
     } catch (e) {
       print('Error saving trip: $e');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to save trip')));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Failed to save trip')));
+      }
     }
   }
 

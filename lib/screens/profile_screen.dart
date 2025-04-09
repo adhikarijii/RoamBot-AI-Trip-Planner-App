@@ -17,6 +17,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _nameController = TextEditingController();
   String? _photoUrl;
   File? _pickedImage;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -43,6 +44,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
+    setState(() => _isSaving = true); // Show loading
+
     String? imageUrl = _photoUrl;
     if (_pickedImage != null) {
       final ref = FirebaseStorage.instance.ref('profile_photos/$uid.jpg');
@@ -55,10 +58,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       'photoUrl': imageUrl,
     });
 
+    setState(() {
+      _photoUrl = imageUrl;
+      _isSaving = false;
+    });
+
+    FocusScope.of(context).unfocus(); // Prevent black screen
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Profile updated successfully")),
     );
-    Navigator.pop(context);
   }
 
   Future<void> _pickImage() async {
@@ -77,7 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ? FileImage(_pickedImage!)
             : _photoUrl != null
             ? NetworkImage(_photoUrl!)
-            : const AssetImage('assets/default_avatar.png');
+            : const AssetImage('assets/default_avatar.png') as ImageProvider;
 
     return Scaffold(
       appBar: CustomAppBar(title: ("Edit Profile")),
@@ -87,10 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             GestureDetector(
               onTap: _pickImage,
-              child: CircleAvatar(
-                radius: 50,
-                backgroundImage: avatar as ImageProvider,
-              ),
+              child: CircleAvatar(radius: 50, backgroundImage: avatar),
             ),
             const SizedBox(height: 20),
             TextField(
@@ -98,7 +103,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               decoration: const InputDecoration(labelText: "Name"),
             ),
             const SizedBox(height: 20),
-            ElevatedButton(onPressed: _saveProfile, child: const Text("Save")),
+            _isSaving
+                ? const CircularProgressIndicator()
+                : ElevatedButton(
+                  onPressed: _saveProfile,
+                  child: const Text("Save"),
+                ),
           ],
         ),
       ),
