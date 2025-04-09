@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:roambot/screens/login_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -55,7 +56,11 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/auth');
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (route) => false, // removes all previous routes
+                  );
                 },
                 child: const Text(
                   'Sign In',

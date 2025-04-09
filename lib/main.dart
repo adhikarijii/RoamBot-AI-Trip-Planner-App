@@ -19,9 +19,8 @@ class MyApp extends StatelessWidget {
       title: 'RoamBot',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 49, 248, 185),
-        ),
+        appBarTheme: AppBarTheme(iconTheme: IconThemeData(color: Colors.white)),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         fontFamily: 'Outfit',
         textTheme: const TextTheme(
           bodyLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),

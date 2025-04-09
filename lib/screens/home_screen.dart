@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:roambot/commons/widgets/customElevatedButtons.dart';
+import 'package:roambot/commons/widgets/custom_elevated_buttons.dart';
 import 'package:roambot/screens/profile_screen.dart';
 import 'package:roambot/screens/trip_creation_screen.dart';
 import 'package:roambot/screens/trip_planner_screen.dart';
@@ -55,8 +55,9 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(
           'Welcome${name != null && name!.isNotEmpty ? ', $name!' : '!'}',
+          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: const Color.fromARGB(255, 135, 238, 164),
+        backgroundColor: Colors.black,
         elevation: 4,
         actions: [
           GestureDetector(
@@ -82,6 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.logout),
             onPressed: () => _logout(context),
             tooltip: 'Logout',
+            color: Colors.white,
           ),
         ],
       ),

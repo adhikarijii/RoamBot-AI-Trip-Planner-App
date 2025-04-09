@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:roambot/commons/widgets/customElevatedButtons.dart';
+import 'package:roambot/commons/widgets/custom_elevated_buttons.dart';
 import 'package:roambot/utils/constants.dart';
 import 'package:roambot/commons/widgets/custom_app_bar.dart';
 
@@ -34,7 +34,7 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: ('Sign Up')),
+      appBar: AppBar(title: const Text('Sign Up')),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(

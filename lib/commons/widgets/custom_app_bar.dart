@@ -35,7 +35,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text('$title${userName != null ? ' - $userName' : ''}'),
+      // leading: BackButton(color: Colors.white),
+      title: Text(
+        '$title${userName != null ? ' - $userName' : ''}',
+        style: TextStyle(color: Colors.white),
+      ),
       actions: [
         GestureDetector(
           onTap: () => _openProfile(context),
@@ -53,9 +57,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         IconButton(
           icon: const Icon(Icons.logout),
           onPressed: () => _logout(context),
+          color: Colors.white,
         ),
       ],
-      backgroundColor: const Color.fromARGB(255, 135, 238, 164),
+      backgroundColor: Colors.black,
       elevation: 4,
     );
   }

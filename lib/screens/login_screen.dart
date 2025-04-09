@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:roambot/commons/widgets/customElevatedButtons.dart';
+import 'package:roambot/commons/widgets/custom_elevated_buttons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'signup_screen.dart';
 import 'package:roambot/utils/constants.dart';
+import 'package:roambot/screens/auth_gate.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -20,15 +21,23 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    _loadSavedCredentials();
+    _loadSavedRememberStatus();
   }
 
-  Future<void> _loadSavedCredentials() async {
+  Future<void> _loadSavedRememberStatus() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      rememberMe = prefs.getBool('remember_me') ?? false;
-      emailController.text = prefs.getString('saved_email') ?? '';
-      passwordController.text = prefs.getString('saved_password') ?? '';
+    rememberMe = prefs.getBool('remember_me') ?? false;
+
+    emailController.addListener(() async {
+      final enteredEmail = emailController.text.trim();
+      final savedEmail = prefs.getString('saved_email') ?? '';
+      final savedPassword = prefs.getString('saved_password') ?? '';
+
+      if (rememberMe && enteredEmail == savedEmail) {
+        setState(() => passwordController.text = savedPassword);
+      } else {
+        setState(() => passwordController.text = '');
+      }
     });
   }
 
@@ -54,8 +63,13 @@ class _LoginScreenState extends State<LoginScreen> {
           );
 
       await _saveCredentials();
-
       currentUserId = userCredential.user!.uid;
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const AuthGate()),
+        (route) => false,
+      );
     } catch (e) {
       ScaffoldMessenger.of(
         context,
@@ -74,6 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
             TextField(
               controller: emailController,
               decoration: const InputDecoration(labelText: "Email"),
+              keyboardType: TextInputType.emailAddress,
             ),
             TextField(
               controller: passwordController,
@@ -94,9 +109,9 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 20),
             customButtons(
-              side: BorderSide(
+              side: const BorderSide(
                 width: 3.0,
-                color: const Color.fromARGB(255, 0, 140, 221),
+                color: Color.fromARGB(255, 0, 140, 221),
               ),
               bcolor: const Color(0xFF3B86F5),
               child: 'Login',
