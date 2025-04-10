@@ -1,10 +1,8 @@
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:roambot/commons/widgets/custom_app_bar.dart';
+import 'package:roambot/screens/profile_screen.dart';
+import 'package:roambot/utils/constants.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -14,11 +12,10 @@ class UserProfileScreen extends StatefulWidget {
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
-  final TextEditingController nameController = TextEditingController();
-  File? _imageFile;
-  bool _isLoading = false;
-
-  final userId = FirebaseAuth.instance.currentUser!.uid;
+  String? name;
+  String? photoUrl;
+  bool isLoading = true;
+  double profileCompletion = 0.0;
 
   @override
   void initState() {
@@ -26,47 +23,193 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _loadUserProfile();
   }
 
-  void _loadUserProfile() async {
-    final snapshot =
-        await FirebaseFirestore.instance.collection('users').doc(userId).get();
-    if (snapshot.exists) {
-      final data = snapshot.data();
-      nameController.text = data?['name'] ?? '';
-    }
-  }
+  Future<void> _loadUserProfile() async {
+    try {
+      final userDoc =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(currentUserId)
+              .get();
+      final data = userDoc.data();
 
-  Future<void> _pickImage() async {
-    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (picked != null) {
+      int filled = 0;
+      int total = 2; // Currently checking 'name' and 'photoUrl'
+
+      final loadedName = data?['name'];
+      final loadedPhotoUrl = data?['photoUrl'];
+
+      if (loadedName != null && loadedName.toString().trim().isNotEmpty)
+        filled++;
+      if (loadedPhotoUrl != null && loadedPhotoUrl.toString().trim().isNotEmpty)
+        filled++;
+
       setState(() {
-        _imageFile = File(picked.path);
+        name = loadedName ?? 'Traveler';
+        photoUrl = loadedPhotoUrl;
+        profileCompletion = filled / total;
+        isLoading = false;
       });
+    } catch (e) {
+      print("Error loading profile: $e");
+      setState(() => isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: ("Edit Profile")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            GestureDetector(
-              onTap: _pickImage,
-              child: CircleAvatar(
-                radius: 30,
-                backgroundImage:
-                    _imageFile != null ? FileImage(_imageFile!) : null,
-                child:
-                    _imageFile == null
-                        ? const Icon(Icons.camera_alt, size: 40)
-                        : null,
+      appBar: const CustomAppBar(title: 'Profile'),
+      body:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 40,
+                            backgroundImage:
+                                photoUrl != null
+                                    ? NetworkImage(photoUrl!)
+                                    : const AssetImage(
+                                          'assets/default_avatar.png',
+                                        )
+                                        as ImageProvider,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Hi, ${name ?? 'Traveler'}',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          LinearProgressIndicator(
+                            value: profileCompletion,
+                            backgroundColor: Colors.grey.shade300,
+                            color: Colors.orange,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${(profileCompletion * 100).toInt()}% completed',
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Appearance section
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Appearance",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ToggleButtons(
+                      isSelected: const [false, true, false],
+                      borderRadius: BorderRadius.circular(10),
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          child: Text('Default'),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          child: Text('Light'),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          child: Text('Dark'),
+                        ),
+                      ],
+                      onPressed: (index) {
+                        // TODO: Handle theme change
+                      },
+                    ),
+                    const SizedBox(height: 30),
+
+                    // Profile section
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Profile",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildTile(Icons.person, "Edit personal information", () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ProfileScreen(),
+                        ),
+                      );
+                    }),
+                    _buildTile(
+                      Icons.scatter_plot_outlined,
+                      "Edit interests",
+                      () {},
+                    ),
+                    _buildTile(
+                      Icons.map_outlined,
+                      "Edit extra information",
+                      () {},
+                    ),
+
+                    const SizedBox(height: 30),
+
+                    // More
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "More",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildTile(Icons.question_mark_sharp, "About", () {}),
+                    _buildTile(Icons.shield_sharp, "Terms of use", () {}),
+                    _buildTile(
+                      Icons.privacy_tip_outlined,
+                      "Privacy Policy",
+                      () {},
+                    ),
+                    _buildTile(Icons.delete, "Delete Account", () {}),
+                    const SizedBox(height: 10),
+                    _buildTile(Icons.logout_outlined, "Log out", () {}),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-          ],
+    );
+  }
+
+  Widget _buildTile(IconData icon, String title, VoidCallback onTap) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      child: ListTile(
+        leading: Icon(icon, color: Colors.black87),
+        title: Text(
+          title,
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
         ),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+        onTap: onTap,
       ),
     );
   }
