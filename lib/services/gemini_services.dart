@@ -10,7 +10,8 @@ class GeminiService {
     try {
       final content = [Content.text(prompt)];
       final response = await _model.generateContent(content);
-      return response.text ?? "No response from AI.";
+      return response.text?.replaceAll(RegExp(r'[#*`_~>-]'), '').trim() ??
+          "No response from AI.";
     } catch (e) {
       print("❌ GeminiService Error: $e");
       return "Itinerary generation failed.";
