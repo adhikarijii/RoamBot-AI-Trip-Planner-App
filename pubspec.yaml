@@ -90,6 +90,7 @@ flutter:
 
   # flutter:
   assets:
+    - assets/
     - assets/fonts/
     - assets/icon/
     - assets/icon/app_icon.png

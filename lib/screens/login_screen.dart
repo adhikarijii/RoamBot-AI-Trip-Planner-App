@@ -115,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Sign in to continue',
+                  'Log in to continue',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Colors.white.withOpacity(0.9),
                   ),

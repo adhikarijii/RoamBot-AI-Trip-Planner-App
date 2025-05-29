@@ -369,10 +369,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         child: Column(
           children: [
             // Hero Carousel
-            _buildDestinationCarousel(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+              child: _buildDestinationCarousel(),
+            ),
 
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(8),
               child: Column(
                 children: [
                   if (travelQuote != null) _buildQuoteCard(theme),
@@ -405,19 +408,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget _buildDestinationCarousel() {
     final popularDestinations = [
       {
-        'image': 'assets/paris.jpg',
-        'title': 'Paris, France',
-        'subtitle': 'City of Lights & Love',
+        'image': 'assets/uttarakhand.jpeg',
+        'title': 'Uttarakhand',
+        'subtitle': 'Dev Bhoomi Uttarakhand',
       },
       {
-        'image': 'assets/tokyo.jpg',
-        'title': 'Tokyo, Japan',
-        'subtitle': 'Where Tradition Meets Future',
+        'image': 'assets/sikkim.jpeg',
+        'title': 'Sikkim',
+        'subtitle': 'Valley of Rice',
       },
       {
-        'image': 'assets/newyork.jpg',
-        'title': 'New York, USA',
-        'subtitle': 'The City That Never Sleeps',
+        'image': 'assets/spiti.jpeg',
+        'title': 'Spiti',
+        'subtitle': 'Winter Wonderland',
       },
     ];
 
