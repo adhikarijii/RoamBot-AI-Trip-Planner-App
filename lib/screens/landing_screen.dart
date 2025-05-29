@@ -84,7 +84,7 @@ class LandingScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   child: Image.asset(
                     'assets/icon/landing1.png',
-                    height: 400,
+                    height: 370,
                     fit: BoxFit.contain,
                   ),
                 ),
