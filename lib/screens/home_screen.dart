@@ -319,10 +319,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final avatar =
-        photoUrl != null
-            ? NetworkImage(photoUrl!)
-            : const AssetImage('assets/default_avatar.png') as ImageProvider;
+    // final avatar =
+    //     photoUrl != null
+    //         ? NetworkImage(photoUrl!)
+    //         : const Icon(Icons.person, size: 18);
+    // // : const AssetImage('assets/default_avatar.png') as ImageProvider;
 
     return Scaffold(
       backgroundColor: theme.colorScheme.background,
@@ -349,7 +350,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               },
               child: CircleAvatar(
                 radius: 18,
-                backgroundImage: avatar,
+                // backgroundImage: avatar,
                 child:
                     photoUrl == null
                         ? const Icon(Icons.person, size: 18)

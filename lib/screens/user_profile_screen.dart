@@ -44,7 +44,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         filled++;
 
       setState(() {
-        name = loadedName ?? 'Traveler';
+        name = loadedName ?? 'Explorer';
         photoUrl = loadedPhotoUrl;
         profileCompletion = filled / total;
         isLoading = false;
@@ -82,7 +82,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Hi, ${name ?? 'Traveler'}',
+                            'Hi, ${name ?? 'Explorer'}',
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,

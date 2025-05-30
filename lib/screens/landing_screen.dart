@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:roambot/screens/login_screen.dart';
 import 'package:roambot/screens/welcome_screen.dart';
 
 class LandingScreen extends StatelessWidget {
@@ -67,7 +68,7 @@ class LandingScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
                   );
                 },
                 child: const Text(
