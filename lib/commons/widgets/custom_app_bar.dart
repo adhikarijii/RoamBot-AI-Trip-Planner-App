@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:roambot/screens/login_screen.dart';
 import 'package:roambot/screens/profile_screen.dart';
 
-class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
   final String? userName;
   final String? profileImageUrl;
@@ -15,14 +15,59 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.profileImageUrl,
   });
 
+  @override
+  State<CustomAppBar> createState() => _CustomAppBarState();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class _CustomAppBarState extends State<CustomAppBar> {
+  void _showLogoutConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Icon(Icons.logout, size: 40, color: Colors.red),
+          content: const Text(
+            'Are you sure you want to log out?',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _logout(context);
+              },
+              child: const Text('Logout', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Logged out successfully")));
-    Navigator.of(
-      context,
-    ).pushReplacement(MaterialPageRoute(builder: (_) => const LoginScreen()));
+    try {
+      await FirebaseAuth.instance.signOut();
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Logged out successfully")));
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const LoginScreen()));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Logout failed. Please try again.")),
+      );
+    }
   }
 
   void _openProfile(BuildContext context) {
@@ -35,10 +80,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      // leading: BackButton(color: Colors.white),
       title: Text(
-        '$title${userName != null ? ' - $userName' : ''}',
-        style: TextStyle(color: Colors.white),
+        '${widget.title}${widget.userName != null ? ' - ${widget.userName}' : ''}',
+        style: const TextStyle(color: Colors.white),
       ),
       actions: [
         GestureDetector(
@@ -47,8 +91,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             padding: const EdgeInsets.all(8.0),
             child: CircleAvatar(
               backgroundImage:
-                  profileImageUrl != null
-                      ? NetworkImage(profileImageUrl!)
+                  widget.profileImageUrl != null
+                      ? NetworkImage(widget.profileImageUrl!)
                       : const AssetImage('assets/default_avatar.png')
                           as ImageProvider,
             ),
@@ -56,7 +100,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         IconButton(
           icon: const Icon(Icons.logout),
-          onPressed: () => _logout(context),
+          onPressed: () => _showLogoutConfirmation(context),
           color: Colors.white,
         ),
       ],
@@ -64,7 +108,4 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 4,
     );
   }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

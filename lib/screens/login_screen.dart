@@ -226,7 +226,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: double.infinity,
                         height: 50,
                         child: customButtons(
-                          side: BorderSide.none,
                           bcolor: Colors.blue.shade700,
                           child: 'Login',
                           fcolor: Colors.white,

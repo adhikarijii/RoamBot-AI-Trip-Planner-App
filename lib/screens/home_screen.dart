@@ -222,6 +222,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:roambot/commons/widgets/customConfirmationBox.dart'
+    show customConfirmationBox;
 import 'package:roambot/commons/widgets/custom_elevated_buttons.dart';
 import 'package:roambot/screens/profile_screen.dart';
 import 'package:roambot/screens/trip_creation_screen.dart';
@@ -303,17 +305,42 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     setState(() => travelQuote = response.trim());
   }
 
-  void _logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Logged out successfully'),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
+  // void _logout(BuildContext context) async {
+  //   await FirebaseAuth.instance.signOut();
+  //   if (!mounted) return;
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: const Text('Logged out successfully'),
+  //       behavior: SnackBarBehavior.floating,
+  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+  //     ),
+  //   );
+  //   Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+  // }
+
+  void _logout(BuildContext context) {
+    // Show confirmation dialog before proceeding
+    customConfirmationBox.show(
+      context: context,
+      text: 'Are you sure you want to log out?',
+      onPressedYes: () async {
+        Navigator.of(context).pop(); // Close the dialog
+        await FirebaseAuth.instance.signOut();
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Logged out successfully'),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil('/login', (route) => false);
+      },
     );
-    Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
   }
 
   @override

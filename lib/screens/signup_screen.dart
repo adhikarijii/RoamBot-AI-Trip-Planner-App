@@ -143,7 +143,6 @@ class _SignupScreenState extends State<SignupScreen> {
                         width: double.infinity,
                         height: 50,
                         child: customButtons(
-                          side: BorderSide.none,
                           bcolor: Colors.blue.shade700,
                           child: 'Sign Up',
                           fcolor: Colors.white,

@@ -2,28 +2,38 @@ import 'package:flutter/material.dart';
 
 class customButtons extends StatelessWidget {
   final Color bcolor;
-  final BorderSide side;
-  final String child;
+  final dynamic child;
   final Color fcolor;
-  final Function? onPressed;
+  final VoidCallback? onPressed;
+  final bool isClicked;
   const customButtons({
     required this.bcolor,
-    required this.side,
     required this.child,
     required this.fcolor,
     required this.onPressed,
+    this.isClicked = false,
   });
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        side: side,
         backgroundColor: bcolor,
         foregroundColor: fcolor,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
-      onPressed: onPressed as void Function()?,
-      child: Text(child.toUpperCase()),
+      onPressed: isClicked ? null : onPressed,
+      child:
+          isClicked
+              ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+              : Text(child.toUpperCase()),
     );
   }
 }
