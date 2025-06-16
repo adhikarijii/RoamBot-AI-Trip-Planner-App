@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:roambot/screens/home_screen.dart';
 import 'package:roambot/screens/profile_screen.dart';
-import 'package:roambot/screens/trip_planner_screen.dart';
+import 'package:roambot/screens/my_trips_screen.dart';
 import 'package:roambot/screens/user_profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -18,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
   );
 
   List<Widget> _buildScreens() {
-    return [HomeScreen(), TripPlannerScreen(), UserProfileScreen()];
+    return [HomeScreen(), MyTripsScreen(), UserProfileScreen()];
   }
 
   List<PersistentBottomNavBarItem> _navBarsItems(

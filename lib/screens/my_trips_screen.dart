@@ -6,14 +6,14 @@ import 'package:roambot/screens/trip_edit_screen.dart';
 import 'package:roambot/utils/constants.dart';
 import 'package:roambot/commons/widgets/custom_app_bar.dart';
 
-class TripPlannerScreen extends StatefulWidget {
-  const TripPlannerScreen({super.key});
+class MyTripsScreen extends StatefulWidget {
+  const MyTripsScreen({super.key});
 
   @override
-  State<TripPlannerScreen> createState() => _TripPlannerScreenState();
+  State<MyTripsScreen> createState() => _MyTripsScreenState();
 }
 
-class _TripPlannerScreenState extends State<TripPlannerScreen> {
+class _MyTripsScreenState extends State<MyTripsScreen> {
   String _searchQuery = '';
 
   Future<void> _confirmDelete(BuildContext context, String tripId) async {

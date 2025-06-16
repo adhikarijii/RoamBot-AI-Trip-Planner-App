@@ -104,39 +104,39 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     const SizedBox(height: 20),
 
                     // Appearance section
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Appearance",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ToggleButtons(
-                      isSelected: const [false, true, false],
-                      borderRadius: BorderRadius.circular(10),
-                      children: const [
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Text('Default'),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Text('Light'),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Text('Dark'),
-                        ),
-                      ],
-                      onPressed: (index) {
-                        // TODO: Handle theme change
-                      },
-                    ),
-                    const SizedBox(height: 30),
+                    // const Align(
+                    //   alignment: Alignment.centerLeft,
+                    //   child: Text(
+                    //     "Appearance",
+                    //     style: TextStyle(
+                    //       fontWeight: FontWeight.bold,
+                    //       fontSize: 16,
+                    //     ),
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 10),
+                    // ToggleButtons(
+                    //   isSelected: const [false, true, false],
+                    //   borderRadius: BorderRadius.circular(10),
+                    //   children: const [
+                    //     Padding(
+                    //       padding: EdgeInsets.symmetric(horizontal: 16),
+                    //       child: Text('Default'),
+                    //     ),
+                    //     Padding(
+                    //       padding: EdgeInsets.symmetric(horizontal: 16),
+                    //       child: Text('Light'),
+                    //     ),
+                    //     Padding(
+                    //       padding: EdgeInsets.symmetric(horizontal: 16),
+                    //       child: Text('Dark'),
+                    //     ),
+                    //   ],
+                    //   onPressed: (index) {
+                    //     // TODO: Handle theme change
+                    //   },
+                    // ),
+                    // const SizedBox(height: 30),
 
                     // Profile section
                     const Align(

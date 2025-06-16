@@ -209,7 +209,7 @@
 //           onPressed: () {
 //             Navigator.push(
 //               context,
-//               MaterialPageRoute(builder: (_) => const TripPlannerScreen()),
+//               MaterialPageRoute(builder: (_) => const MyTripsScreen()),
 //             );
 //           },
 //         ),
@@ -227,7 +227,7 @@ import 'package:roambot/commons/widgets/customConfirmationBox.dart'
 import 'package:roambot/commons/widgets/custom_elevated_buttons.dart';
 import 'package:roambot/screens/profile_screen.dart';
 import 'package:roambot/screens/trip_creation_screen.dart';
-import 'package:roambot/screens/trip_planner_screen.dart';
+import 'package:roambot/screens/my_trips_screen.dart';
 import 'package:roambot/services/gemini_services.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -605,9 +605,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const TripPlannerScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const MyTripsScreen()),
                   );
                 },
               ),
@@ -615,33 +613,33 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ],
         ),
         const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _buildActionButton(
-                context,
-                icon: Icons.explore,
-                label: 'Discover',
-                color: theme.colorScheme.tertiaryContainer,
-                onTap: () {
-                  // Navigate to discover screen
-                },
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildActionButton(
-                context,
-                icon: Icons.favorite,
-                label: 'Saved',
-                color: Colors.pink.shade100,
-                onTap: () {
-                  // Navigate to saved items
-                },
-              ),
-            ),
-          ],
-        ),
+        // Row(
+        //   children: [
+        //     Expanded(
+        //       child: _buildActionButton(
+        //         context,
+        //         icon: Icons.explore,
+        //         label: 'Discover',
+        //         color: theme.colorScheme.tertiaryContainer,
+        //         onTap: () {
+        //           // Navigate to discover screen
+        //         },
+        //       ),
+        //     ),
+        //     const SizedBox(width: 12),
+        //     Expanded(
+        //       child: _buildActionButton(
+        //         context,
+        //         icon: Icons.favorite,
+        //         label: 'Saved',
+        //         color: Colors.pink.shade100,
+        //         onTap: () {
+        //           // Navigate to saved items
+        //         },
+        //       ),
+        //     ),
+        //   ],
+        // ),
       ],
     );
   }
@@ -704,18 +702,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   color: theme.colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
-              const SizedBox(height: 16),
-              OutlinedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const TripCreationScreen(),
-                    ),
-                  );
-                },
-                child: const Text('Plan your first trip'),
-              ),
+              // const SizedBox(height: 16),
+              // OutlinedButton(
+              //   onPressed: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (_) => const TripCreationScreen(),
+              //       ),
+              //     );
+              //   },
+              //   child: const Text('Plan your first trip'),
+              // ),
             ],
           );
         }
@@ -738,9 +736,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => const TripPlannerScreen(),
-                      ),
+                      MaterialPageRoute(builder: (_) => const MyTripsScreen()),
                     );
                   },
                   child: const Text('View All'),
