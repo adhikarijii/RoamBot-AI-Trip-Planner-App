@@ -429,19 +429,20 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
       body:
           _isLoading
               ? const Center(child: CircularProgressIndicator())
-              : Padding(
+              : SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
-                child: Form(
-                  key: _formKey,
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
                       TextFormField(
                         controller: _destinationController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Destination',
-                          prefixIcon: Icon(Icons.location_on),
-                          border: OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.location_on),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         validator:
                             (value) =>
@@ -488,10 +489,12 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
                       TextFormField(
                         controller: _budgetController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Budget (₹)',
-                          prefixIcon: Icon(Icons.currency_rupee),
-                          border: OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.currency_rupee),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         validator:
                             (value) =>
@@ -503,10 +506,12 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
                       TextFormField(
                         controller: _peopleController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Number of People',
-                          prefixIcon: Icon(Icons.people),
-                          border: OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.people),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         validator:
                             (value) =>

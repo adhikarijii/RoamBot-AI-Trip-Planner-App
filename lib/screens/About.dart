@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:roambot/commons/widgets/customFontSize.dart';
 
 class About extends StatelessWidget {
   const About({super.key});
@@ -28,10 +29,14 @@ Developed by Rahul Singh Adhikari
         ),
         backgroundColor: Colors.black,
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(16),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
-          child: Text(content, style: TextStyle(fontSize: 16, height: 1.5)),
+          child: Text(
+            content,
+            style: TextStyle(fontSize: customFontSize(context, 14)),
+            textAlign: TextAlign.justify,
+          ),
         ),
       ),
     );

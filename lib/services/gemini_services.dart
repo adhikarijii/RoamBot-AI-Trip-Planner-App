@@ -3,7 +3,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 class GeminiService {
   final _model = GenerativeModel(
     model: 'gemini-1.5-pro',
-    apiKey: 'AIzaSyCpyI35BFIaDlGwEGLhmp4t2ZO7H5PrAhc',
+    apiKey: 'AIzaSyAltC6kAmMNGvKP8n-0UDn5jD8E0GleyNY',
   );
 
   Future<String> generateTripPlan(String prompt) async {

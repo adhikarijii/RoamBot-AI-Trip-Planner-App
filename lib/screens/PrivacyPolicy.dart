@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:roambot/commons/widgets/customFontSize.dart';
 
 class PrivacyPolicy extends StatelessWidget {
   const PrivacyPolicy({super.key});
@@ -9,7 +10,7 @@ class PrivacyPolicy extends StatelessWidget {
 RoamBot values your privacy. Here's how we handle your data:
 
 1. Data Collection:
-   We collect basic personal information (like name, email, profile photo) and trip data to provide personalized experiences.
+  We collect basic personal information (like name, email, profile photo) and trip data to provide personalized experiences.
 
 2. Use of Data:
    Your data is used only to improve your travel planning experience. We do not sell or share it with third parties.
@@ -38,7 +39,9 @@ RoamBot values your privacy. Here's how we handle your data:
         child: SingleChildScrollView(
           child: Text(
             content,
-            style: const TextStyle(fontSize: 16, height: 1.5),
+            style: TextStyle(fontSize: customFontSize(context, 14)),
+            textAlign: TextAlign.justify,
+            // style: const TextStyle(fontSize: 16, height: 1.5),
           ),
         ),
       ),

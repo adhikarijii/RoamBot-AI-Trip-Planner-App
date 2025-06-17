@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:roambot/commons/widgets/customFontSize.dart';
 
 class TermsOfUse extends StatelessWidget {
   const TermsOfUse({super.key});
@@ -38,7 +39,8 @@ By using RoamBot, you agree to the following Terms of Use:
         child: SingleChildScrollView(
           child: Text(
             content,
-            style: const TextStyle(fontSize: 16, height: 1.5),
+            style: TextStyle(fontSize: customFontSize(context, 14)),
+            textAlign: TextAlign.justify,
           ),
         ),
       ),

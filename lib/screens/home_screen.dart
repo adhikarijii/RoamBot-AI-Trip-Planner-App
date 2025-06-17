@@ -401,13 +401,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
               child: _buildDestinationCarousel(),
             ),
+            const SizedBox(height: 10),
 
             Padding(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 children: [
-                  if (travelQuote != null) _buildQuoteCard(theme),
-                  const SizedBox(height: 20),
+                  // if (travelQuote != null) _buildQuoteCard(theme),
+                  // const SizedBox(height: 20),
                   _buildQuickActions(context, theme),
                   const SizedBox(height: 24),
                   _buildUpcomingTrips(theme),
