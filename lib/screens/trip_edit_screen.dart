@@ -79,7 +79,7 @@ class _TripEditScreenState extends State<TripEditScreen> {
 
     final prompt = '''
 Regenerate a detailed itinerary for a trip to $destination from ${DateFormat('MMMM d, yyyy').format(_startDate!)} to ${DateFormat('MMMM d, yyyy').format(_endDate!)}.
-The budget is ₹$budget and number of people going is $people. Break the itinerary day-wise and include places to visit, activities, and estimated time.
+The budget is ₹$budget and number of people going is $people. Break the itinerary day-wise and include places to visit, activities, and estimated time. And also include the contact details of local Hotel, homestay owners. 
 ''';
 
     try {

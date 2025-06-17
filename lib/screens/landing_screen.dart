@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:roambot/screens/login_screen.dart';
-import 'package:roambot/screens/welcome_screen.dart';
 
 class LandingScreen extends StatelessWidget {
   const LandingScreen({super.key});
