@@ -4,7 +4,10 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import '../utils/constants.dart';
 
 class AIService {
-  final _model = GenerativeModel(model: 'gemini-pro', apiKey: geminiApiKey);
+  final _model = GenerativeModel(
+    model: 'gemini-2.5-flash',
+    apiKey: geminiApiKey,
+  );
 
   Future<String?> generateItinerary(
     String destination,

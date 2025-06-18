@@ -438,7 +438,7 @@ class UserProfileScreen extends StatelessWidget {
           );
         }),
 
-        const SizedBox(height: 30),
+        const SizedBox(height: 20),
         const Align(
           alignment: Alignment.centerLeft,
           child: Text(
@@ -465,10 +465,7 @@ class UserProfileScreen extends StatelessWidget {
             MaterialPageRoute(builder: (_) => const PrivacyPolicy()),
           );
         }),
-        _buildTile(Icons.delete, "Delete Account", () {
-          // TODO: Add account deletion logic
-        }),
-        const SizedBox(height: 10),
+        _buildTile(Icons.delete, "Delete Account", () {}),
         _buildTile(Icons.logout_outlined, "Log out", () {
           _showLogoutConfirmation(context);
         }),

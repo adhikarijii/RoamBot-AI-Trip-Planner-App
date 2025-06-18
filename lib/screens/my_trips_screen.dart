@@ -63,10 +63,12 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
           Padding(
             padding: const EdgeInsets.all(12),
             child: TextField(
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: 'Search trips by destination...',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               onChanged:
                   (value) => setState(() => _searchQuery = value.toLowerCase()),
@@ -137,7 +139,10 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                         child: ListTile(
                           title: Text(
                             data['destination'] ?? '',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

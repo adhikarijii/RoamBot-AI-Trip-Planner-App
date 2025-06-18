@@ -1,9 +1,10 @@
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:roambot/utils/constants.dart';
 
 class GeminiService {
   final _model = GenerativeModel(
-    model: 'gemini-1.5-pro',
-    apiKey: 'AIzaSyAltC6kAmMNGvKP8n-0UDn5jD8E0GleyNY',
+    model: 'gemini-2.5-flash',
+    apiKey: geminiApiKey,
   );
 
   Future<String> generateTripPlan(String prompt) async {

@@ -303,7 +303,8 @@ class _TripCreationScreenState extends State<TripCreationScreen> {
   }
 
   Future<void> _generateAndSaveTrip() async {
-    if (!_formKey.currentState!.validate() ||
+    if (_formKey.currentState == null ||
+        !_formKey.currentState!.validate() ||
         _startDate == null ||
         _endDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -338,7 +339,9 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
     } catch (e) {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to generate itinerary')),
+        SnackBar(
+          content: Text('Failed to generate itinerary: ${e.toString()}'),
+        ),
       );
     }
   }
@@ -431,101 +434,105 @@ The budget is ₹$budget and number of people going is $people. Break the itiner
               ? const Center(child: CircularProgressIndicator())
               : SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        controller: _destinationController,
-                        decoration: InputDecoration(
-                          labelText: 'Destination',
-                          prefixIcon: const Icon(Icons.location_on),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        validator:
-                            (value) =>
-                                value == null || value.isEmpty
-                                    ? 'Enter destination'
-                                    : null,
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton.icon(
-                              onPressed: () => _pickDate(context, true),
-                              icon: const Icon(Icons.calendar_today),
-                              label: Text(
-                                _startDate == null
-                                    ? 'Start Date'
-                                    : DateFormat(
-                                      'MMM d, yyyy',
-                                    ).format(_startDate!),
-                              ),
+                child: Form(
+                  key: _formKey,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      children: [
+                        // Your form fields here
+                        TextFormField(
+                          controller: _destinationController,
+                          decoration: InputDecoration(
+                            labelText: 'Destination',
+                            prefixIcon: const Icon(Icons.location_on),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: OutlinedButton.icon(
-                              onPressed:
+                          validator:
+                              (value) =>
+                                  value == null || value.isEmpty
+                                      ? 'Enter destination'
+                                      : null,
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () => _pickDate(context, true),
+                                icon: const Icon(Icons.calendar_today),
+                                label: Text(
                                   _startDate == null
-                                      ? null
-                                      : () => _pickDate(context, false),
-                              icon: const Icon(Icons.calendar_month),
-                              label: Text(
-                                _endDate == null
-                                    ? 'End Date'
-                                    : DateFormat(
-                                      'MMM d, yyyy',
-                                    ).format(_endDate!),
+                                      ? 'Start Date'
+                                      : DateFormat(
+                                        'MMM d, yyyy',
+                                      ).format(_startDate!),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _budgetController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: 'Budget (₹)',
-                          prefixIcon: const Icon(Icons.currency_rupee),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed:
+                                    _startDate == null
+                                        ? null
+                                        : () => _pickDate(context, false),
+                                icon: const Icon(Icons.calendar_month),
+                                label: Text(
+                                  _endDate == null
+                                      ? 'End Date'
+                                      : DateFormat(
+                                        'MMM d, yyyy',
+                                      ).format(_endDate!),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        validator:
-                            (value) =>
-                                value == null || value.isEmpty
-                                    ? 'Enter budget'
-                                    : null,
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _peopleController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: 'Number of People',
-                          prefixIcon: const Icon(Icons.people),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _budgetController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Budget (₹)',
+                            prefixIcon: const Icon(Icons.currency_rupee),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
+                          validator:
+                              (value) =>
+                                  value == null || value.isEmpty
+                                      ? 'Enter budget'
+                                      : null,
                         ),
-                        validator:
-                            (value) =>
-                                value == null || value.isEmpty
-                                    ? 'Enter number of people'
-                                    : null,
-                      ),
-                      const SizedBox(height: 24),
-                      FilledButton.icon(
-                        icon: const Icon(Icons.flight_takeoff),
-                        label: const Text('Generate Itinerary'),
-                        onPressed: _generateAndSaveTrip,
-                      ),
-                    ],
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _peopleController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Number of People',
+                            prefixIcon: const Icon(Icons.people),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          validator:
+                              (value) =>
+                                  value == null || value.isEmpty
+                                      ? 'Enter number of people'
+                                      : null,
+                        ),
+                        const SizedBox(height: 24),
+                        FilledButton.icon(
+                          icon: const Icon(Icons.flight_takeoff),
+                          label: const Text('Generate Itinerary'),
+                          onPressed: _generateAndSaveTrip,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

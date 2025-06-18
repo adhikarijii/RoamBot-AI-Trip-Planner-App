@@ -9,6 +9,7 @@ import 'package:roambot/screens/profile_screen.dart';
 import 'package:roambot/screens/trip_creation_screen.dart';
 import 'package:roambot/screens/my_trips_screen.dart';
 import 'package:roambot/services/gemini_services.dart';
+import 'package:roambot/utils/constants.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -479,10 +480,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       future:
           FirebaseFirestore.instance
               .collection('trips')
-              .where(
-                'userId',
-                isEqualTo: FirebaseAuth.instance.currentUser!.uid,
-              )
+              .where('userId', isEqualTo: currentUserId)
               .orderBy('startDate', descending: false)
               .limit(3)
               .get(),
