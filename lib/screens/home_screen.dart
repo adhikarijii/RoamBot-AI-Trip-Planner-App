@@ -480,14 +480,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       future:
           FirebaseFirestore.instance
               .collection('trips')
-              .where('userId', isEqualTo: currentUserId)
-              .orderBy('startDate', descending: false)
+              .where(
+                'userId',
+                isEqualTo: FirebaseAuth.instance.currentUser?.uid ?? '',
+              )
+              .where('startDate', isGreaterThanOrEqualTo: Timestamp.now())
+              .orderBy('startDate', descending: true)
               .limit(3)
               .get(),
       builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          print('Error fetching trips: ${snapshot.error}');
+          return Text('Error: ${snapshot.error}');
+        }
+
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
+
+        print('Fetched ${snapshot.data?.docs.length} trips');
 
         final trips = snapshot.data?.docs ?? [];
 
@@ -563,19 +574,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         padding: const EdgeInsets.all(12.0),
         child: Row(
           children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.airplanemode_active,
-                color: theme.colorScheme.primary,
-                size: 30,
-              ),
-            ),
+            // Container(
+            //   width: 60,
+            //   height: 60,
+            //   decoration: BoxDecoration(
+            //     color: theme.colorScheme.primary.withOpacity(0.1),
+            //     borderRadius: BorderRadius.circular(8),
+            //   ),
+            //   child: Icon(
+            //     Icons.airplanemode_active,
+            //     color: theme.colorScheme.primary,
+            //     size: 30,
+            //   ),
+            // ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(

@@ -15,6 +15,9 @@ class MyTripsScreen extends StatefulWidget {
 
 class _MyTripsScreenState extends State<MyTripsScreen> {
   String _searchQuery = '';
+  bool _isTripEditable(DateTime endDate) {
+    return endDate.isAfter(DateTime.now());
+  }
 
   Future<void> _confirmDelete(BuildContext context, String tripId) async {
     final shouldDelete = await showDialog<bool>(
@@ -155,24 +158,27 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.edit,
-                                  color: Colors.blue,
+                              if (_isTripEditable(
+                                endDate,
+                              )) // Only show edit button if trip is editable
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.edit,
+                                    color: Colors.blue,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (_) => TripEditScreen(
+                                              tripId: doc.id,
+                                              trip: data,
+                                            ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder:
-                                          (_) => TripEditScreen(
-                                            tripId: doc.id,
-                                            trip: data,
-                                          ),
-                                    ),
-                                  );
-                                },
-                              ),
                               IconButton(
                                 icon: const Icon(
                                   Icons.delete,
