@@ -78,8 +78,33 @@ class _TripEditScreenState extends State<TripEditScreen> {
     setState(() => _isLoading = true);
 
     final prompt = '''
-Regenerate a detailed itinerary for a trip to $destination from ${DateFormat('MMMM d, yyyy').format(_startDate!)} to ${DateFormat('MMMM d, yyyy').format(_endDate!)}.
-The budget is ₹$budget and number of people going is $people. Break the itinerary day-wise and include places to visit, activities, and estimated time. And also include the contact details of local Hotel, homestay owners. 
+Create a comprehensive, day-by-day travel itinerary for a trip to $destination from ${DateFormat('MMMM d, yyyy').format(_startDate!)} to ${DateFormat('MMMM d, yyyy').format(_endDate!)} for $people people with a budget of ₹$budget.
+
+Please structure the itinerary with the following details for each day:
+1. Day number and date (format: "Day 1: Monday, June 10, 2024")
+2. Morning, afternoon, and evening activities with time slots
+3. Key attractions to visit with brief descriptions (50 words max each)
+4. Recommended dining options (breakfast, lunch, dinner) with price ranges
+5. Transportation options between locations with estimated costs
+6. Estimated daily expenditure breakdown
+7. Travel tips and precautions for the day
+
+Additional required information:
+- Contact details of 2-3 recommended hotels/homestays with price ranges
+- Emergency contacts (local police, hospital, embassy)
+- Packing suggestions based on the destination and season
+- Cultural norms/etiquette to be aware of
+- Budget-saving tips specific to the location
+
+Formatting guidelines:
+- Use clear section headings (## Day 1 ##)
+- Separate different elements with blank lines
+- Use bullet points for lists
+- Bold important information like **Budget tip:**
+- Keep time estimates in 24-hour format (e.g., 14:00-15:30)
+- Include approximate walking distances/times between nearby attractions
+
+Make the itinerary practical, realistic, and optimized for time and budget constraints. Prioritize must-see attractions while allowing for adequate rest time.
 ''';
 
     try {

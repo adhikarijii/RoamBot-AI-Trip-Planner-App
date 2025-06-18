@@ -414,33 +414,33 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ],
         ),
         const SizedBox(height: 12),
-        // Row(
-        //   children: [
-        //     Expanded(
-        //       child: _buildActionButton(
-        //         context,
-        //         icon: Icons.explore,
-        //         label: 'Discover',
-        //         color: theme.colorScheme.tertiaryContainer,
-        //         onTap: () {
-        //           // Navigate to discover screen
-        //         },
-        //       ),
-        //     ),
-        //     const SizedBox(width: 12),
-        //     Expanded(
-        //       child: _buildActionButton(
-        //         context,
-        //         icon: Icons.favorite,
-        //         label: 'Saved',
-        //         color: Colors.pink.shade100,
-        //         onTap: () {
-        //           // Navigate to saved items
-        //         },
-        //       ),
-        //     ),
-        //   ],
-        // ),
+        Row(
+          children: [
+            Expanded(
+              child: _buildActionButton(
+                context,
+                icon: Icons.explore,
+                label: 'Book Trips/Tours',
+                color: theme.colorScheme.tertiaryContainer,
+                onTap: () {
+                  // Navigate to Book Trip screen
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildActionButton(
+                context,
+                icon: Icons.favorite,
+                label: 'Saved',
+                color: Colors.green.shade100,
+                onTap: () {
+                  // Navigate to saved items
+                },
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -459,7 +459,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(50),
         ),
         child: Column(
           children: [
