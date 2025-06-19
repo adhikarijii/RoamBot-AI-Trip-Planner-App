@@ -79,6 +79,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return AppBar(
       title: Text(
         '${widget.title}${widget.userName != null ? ' - ${widget.userName}' : ''}',
@@ -104,7 +105,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
           color: Colors.white,
         ),
       ],
-      backgroundColor: Colors.black,
+      backgroundColor: theme.colorScheme.primary,
       elevation: 4,
     );
   }

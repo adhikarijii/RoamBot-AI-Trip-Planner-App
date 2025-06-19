@@ -91,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       context: context,
       text: 'Are you sure you want to log out?',
       onPressedYes: () async {
-        Navigator.of(context).pop(); // Close the dialog
+        Navigator.of(context).pop();
         await FirebaseAuth.instance.signOut();
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(

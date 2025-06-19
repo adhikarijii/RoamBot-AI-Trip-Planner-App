@@ -1,352 +1,8 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:flutter/material.dart';
-// import 'package:intl/intl.dart';
-// import 'package:roambot/services/gemini_services.dart';
-// import 'package:roambot/utils/constants.dart';
-// import 'package:roambot/commons/widgets/custom_app_bar.dart';
-
-// class TripCreationScreen extends StatefulWidget {
-//   const TripCreationScreen({Key? key}) : super(key: key);
-
-//   @override
-//   State<TripCreationScreen> createState() => _TripCreationScreenState();
-// }
-
-// class _TripCreationScreenState extends State<TripCreationScreen> {
-//   final _formKey = GlobalKey<FormState>();
-//   final TextEditingController _destinationController = TextEditingController();
-//   final TextEditingController _budgetController = TextEditingController();
-//   final TextEditingController _peopleController = TextEditingController();
-
-//   DateTime? _startDate;
-//   DateTime? _endDate;
-//   String? _generatedItinerary;
-//   bool _isLoading = false;
-
-//   Future<void> _pickDate(BuildContext context, bool isStartDate) async {
-//     final initialDate =
-//         isStartDate
-//             ? (_startDate ?? DateTime.now())
-//             : (_endDate ?? (_startDate ?? DateTime.now()));
-//     final firstDate =
-//         isStartDate ? DateTime.now() : (_startDate ?? DateTime.now());
-//     final picked = await showDatePicker(
-//       context: context,
-//       initialDate: initialDate,
-//       firstDate: firstDate,
-//       lastDate: DateTime(2100),
-//     );
-//     if (picked != null) {
-//       setState(() {
-//         if (isStartDate) {
-//           _startDate = picked;
-//           if (_endDate != null && _endDate!.isBefore(picked)) {
-//             _endDate = null;
-//           }
-//         } else {
-//           _endDate = picked;
-//         }
-//       });
-//     }
-//   }
-
-//   String cleanAndFormatItinerary(String itinerary) {
-//     return itinerary
-//         // Convert markdown headings to readable sections
-//         .replaceAllMapped(
-//           RegExp(r'^#+\s+(.*)', multiLine: true),
-//           (match) =>
-//               '\n${match.group(1)?.toUpperCase()}\n${'-' * (match.group(1)?.length ?? 0)}\n',
-//         )
-//         // Convert lists to bullet points
-//         .replaceAllMapped(
-//           RegExp(r'^\s*[\-*+]\s+(.*)', multiLine: true),
-//           (match) => '• ${match.group(1)}',
-//         )
-//         // Clean other markdown
-//         .replaceAll('**', '')
-//         .replaceAll('__', '')
-//         .replaceAll(RegExp(r'`{1,3}'), '')
-//         .replaceAllMapped(
-//           RegExp(r'\[(.*?)\]\(.*?\)'),
-//           (match) => match.group(1) ?? '',
-//         )
-//         .replaceAll(RegExp(r'\n{3,}'), '\n\n')
-//         .trim();
-//   }
-
-//   Future<void> _generateAndSaveTrip() async {
-//     if (_formKey.currentState == null ||
-//         !_formKey.currentState!.validate() ||
-//         _startDate == null ||
-//         _endDate == null) {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(
-//           content: Text('Please fill all fields and select dates'),
-//         ),
-//       );
-//       return;
-//     }
-
-//     final destination = _destinationController.text.trim();
-//     final budget = _budgetController.text.trim();
-//     final people = _peopleController.text.trim();
-
-//     setState(() => _isLoading = true);
-
-//     //     final prompt = '''
-//     // Create a detailed itinerary for a trip to $destination from ${DateFormat('MMMM d, yyyy').format(_startDate!)} to ${DateFormat('MMMM d, yyyy').format(_endDate!)}.
-//     // The budget is ₹$budget and number of people going is $people. Break the itinerary day-wise and include places to visit, activities, and estimated time. And also include the contact details of local Hotel, homestay owners.
-//     // ''';
-//     final prompt = '''
-// Create a comprehensive, day-by-day travel itinerary for a trip to $destination from ${DateFormat('MMMM d, yyyy').format(_startDate!)} to ${DateFormat('MMMM d, yyyy').format(_endDate!)} for $people people with a budget of ₹$budget.
-
-// Please structure the itinerary with the following details for each day:
-// 1. Day number and date (format: "Day 1: Monday, June 10, 2024")
-// 2. Morning, afternoon, and evening activities with time slots
-// 3. Key attractions to visit with brief descriptions (50 words max each)
-// 4. Recommended dining options (breakfast, lunch, dinner) with price ranges
-// 5. Transportation options between locations with estimated costs
-// 6. Estimated daily expenditure breakdown
-// 7. Travel tips and precautions for the day
-
-// Additional required information:
-// - Contact details of 2-3 recommended hotels/homestays with price ranges
-// - Emergency contacts (local police, hospital, embassy)
-// - Packing suggestions based on the destination and season
-// - Cultural norms/etiquette to be aware of
-// - Budget-saving tips specific to the location
-
-// Formatting guidelines:
-// - Use clear section headings (## Day 1 ##)
-// - Separate different elements with blank lines
-// - Use bullet points for lists
-// - Bold important information like **Budget tip:**
-// - Keep time estimates in 24-hour format (e.g., 14:00-15:30)
-// - Include approximate walking distances/times between nearby attractions
-
-// Make the itinerary practical, realistic, and optimized for time and budget constraints. Prioritize must-see attractions while allowing for adequate rest time.
-// ''';
-
-//     try {
-//       final itinerary = await GeminiService().generateTripPlan(prompt);
-//       // final cleanedItinerary = itinerary.replaceAll(RegExp(r'[#*`_]'), '');
-//       final cleanedItinerary = cleanAndFormatItinerary(itinerary);
-
-//       setState(() {
-//         _generatedItinerary = cleanedItinerary;
-//         _isLoading = false;
-//       });
-
-//       _showItineraryPreviewDialog(cleanedItinerary);
-//     } catch (e) {
-//       setState(() => _isLoading = false);
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(
-//           content: Text('Failed to generate itinerary: ${e.toString()}'),
-//         ),
-//       );
-//     }
-//   }
-
-//   Future<void> _showItineraryPreviewDialog(String itinerary) async {
-//     showDialog(
-//       context: context,
-//       barrierDismissible: false,
-//       builder:
-//           (context) => AlertDialog(
-//             insetPadding: const EdgeInsets.all(16),
-//             shape: RoundedRectangleBorder(
-//               borderRadius: BorderRadius.circular(16),
-//             ),
-//             title: const Text('Itinerary Preview'),
-//             content: SizedBox(
-//               height: MediaQuery.of(context).size.height * 0.5,
-//               width: double.maxFinite,
-//               child: SingleChildScrollView(child: Text(itinerary)),
-//             ),
-//             actionsAlignment: MainAxisAlignment.spaceBetween,
-//             actions: [
-//               TextButton(
-//                 onPressed: () => Navigator.pop(context),
-//                 child: const Text('Edit'),
-//               ),
-//               FilledButton(
-//                 onPressed: () {
-//                   Navigator.pop(context);
-//                   _saveTrip();
-//                 },
-//                 child: const Text('Save Trip'),
-//               ),
-//             ],
-//           ),
-//     );
-//   }
-
-//   Future<void> _saveTrip() async {
-//     try {
-//       await FirebaseFirestore.instance.collection('trips').add({
-//         'userId': currentUserId,
-//         'destination': _destinationController.text.trim(),
-//         'startDate': Timestamp.fromDate(_startDate!),
-//         'endDate': Timestamp.fromDate(_endDate!),
-//         'budget': _budgetController.text.trim(),
-//         'people': _peopleController.text.trim(),
-//         'createdAt': Timestamp.now(),
-//         'itinerary': _generatedItinerary ?? '',
-//       });
-
-//       if (mounted) {
-//         showDialog(
-//           context: context,
-//           barrierDismissible: false,
-//           builder:
-//               (ctx) => AlertDialog(
-//                 shape: RoundedRectangleBorder(
-//                   borderRadius: BorderRadius.circular(16),
-//                 ),
-//                 title: const Text('Success'),
-//                 content: const Text('Trip has been saved successfully!'),
-//                 actions: [
-//                   TextButton(
-//                     onPressed: () {
-//                       Navigator.of(ctx).pop();
-//                       Navigator.of(context).pop(); // Pop TripCreationScreen
-//                     },
-//                     child: const Text('OK'),
-//                   ),
-//                 ],
-//               ),
-//         );
-//       }
-//     } catch (e) {
-//       if (mounted) {
-//         ScaffoldMessenger.of(
-//           context,
-//         ).showSnackBar(const SnackBar(content: Text('Failed to save trip')));
-//       }
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: const CustomAppBar(title: 'Plan a Trip'),
-//       body:
-//           _isLoading
-//               ? const Center(child: CircularProgressIndicator())
-//               : SingleChildScrollView(
-//                 padding: const EdgeInsets.all(16),
-//                 child: Form(
-//                   key: _formKey,
-//                   child: Padding(
-//                     padding: const EdgeInsets.all(10),
-//                     child: Column(
-//                       children: [
-//                         // Your form fields here
-//                         TextFormField(
-//                           controller: _destinationController,
-//                           decoration: InputDecoration(
-//                             labelText: 'Destination',
-//                             prefixIcon: const Icon(Icons.location_on),
-//                             border: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(12),
-//                             ),
-//                           ),
-//                           validator:
-//                               (value) =>
-//                                   value == null || value.isEmpty
-//                                       ? 'Enter destination'
-//                                       : null,
-//                         ),
-//                         const SizedBox(height: 16),
-//                         Row(
-//                           children: [
-//                             Expanded(
-//                               child: OutlinedButton.icon(
-//                                 onPressed: () => _pickDate(context, true),
-//                                 icon: const Icon(Icons.calendar_today),
-//                                 label: Text(
-//                                   _startDate == null
-//                                       ? 'Start Date'
-//                                       : DateFormat(
-//                                         'MMM d, yyyy',
-//                                       ).format(_startDate!),
-//                                 ),
-//                               ),
-//                             ),
-//                             const SizedBox(width: 8),
-//                             Expanded(
-//                               child: OutlinedButton.icon(
-//                                 onPressed:
-//                                     _startDate == null
-//                                         ? null
-//                                         : () => _pickDate(context, false),
-//                                 icon: const Icon(Icons.calendar_month),
-//                                 label: Text(
-//                                   _endDate == null
-//                                       ? 'End Date'
-//                                       : DateFormat(
-//                                         'MMM d, yyyy',
-//                                       ).format(_endDate!),
-//                                 ),
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                         const SizedBox(height: 16),
-//                         TextFormField(
-//                           controller: _budgetController,
-//                           keyboardType: TextInputType.number,
-//                           decoration: InputDecoration(
-//                             labelText: 'Budget (₹)',
-//                             prefixIcon: const Icon(Icons.currency_rupee),
-//                             border: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(12),
-//                             ),
-//                           ),
-//                           validator:
-//                               (value) =>
-//                                   value == null || value.isEmpty
-//                                       ? 'Enter budget'
-//                                       : null,
-//                         ),
-//                         const SizedBox(height: 16),
-//                         TextFormField(
-//                           controller: _peopleController,
-//                           keyboardType: TextInputType.number,
-//                           decoration: InputDecoration(
-//                             labelText: 'Number of People',
-//                             prefixIcon: const Icon(Icons.people),
-//                             border: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(12),
-//                             ),
-//                           ),
-//                           validator:
-//                               (value) =>
-//                                   value == null || value.isEmpty
-//                                       ? 'Enter number of people'
-//                                       : null,
-//                         ),
-//                         const SizedBox(height: 24),
-//                         FilledButton.icon(
-//                           icon: const Icon(Icons.flight_takeoff),
-//                           label: const Text('Generate Itinerary'),
-//                           onPressed: _generateAndSaveTrip,
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//     );
-//   }
-// }
-
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http show head;
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:roambot/services/gemini_services.dart';
@@ -402,28 +58,51 @@ class _TripCreationScreenState extends State<TripCreationScreen> {
   }
 
   String cleanAndFormatItinerary(String itinerary) {
-    return itinerary
-        // Convert markdown headings to readable sections
-        .replaceAllMapped(
-          RegExp(r'^#+\s+(.*)', multiLine: true),
-          (match) =>
-              '\n${match.group(1)?.toUpperCase()}\n${'-' * (match.group(1)?.length ?? 0)}\n',
-        )
-        // Convert lists to bullet points
-        .replaceAllMapped(
-          RegExp(r'^\s*[\-*+]\s+(.*)', multiLine: true),
-          (match) => '• ${match.group(1)}',
-        )
-        // Clean other markdown
-        .replaceAll('**', '')
-        .replaceAll('__', '')
-        .replaceAll(RegExp(r'`{1,3}'), '')
-        .replaceAllMapped(
-          RegExp(r'\[(.*?)\]\(.*?\)'),
-          (match) => match.group(1) ?? '',
-        )
-        .replaceAll(RegExp(r'\n{3,}'), '\n\n')
-        .trim();
+    // Split into lines and process each one
+    final lines = itinerary.split('\n');
+    final formattedLines = <String>[];
+
+    for (var line in lines) {
+      if (line.trim().isEmpty) {
+        // Preserve empty lines for paragraph spacing
+        formattedLines.add('');
+        continue;
+      }
+
+      // Handle section headers
+      if (line.startsWith('##')) {
+        formattedLines.add('');
+        formattedLines.add(line.replaceAll('#', '').trim().toUpperCase());
+        formattedLines.add('');
+        continue;
+      }
+
+      // Handle bullet points
+      if (line.trim().startsWith('•') ||
+          line.trim().startsWith('-') ||
+          line.trim().startsWith('*')) {
+        formattedLines.add(line.trim());
+        continue;
+      }
+
+      // Handle numbered lists
+      if (RegExp(r'^\d+\.').hasMatch(line.trim())) {
+        formattedLines.add(line.trim());
+        continue;
+      }
+
+      // Regular text - ensure it's properly spaced
+      if (formattedLines.isNotEmpty &&
+          formattedLines.last.isNotEmpty &&
+          !formattedLines.last.endsWith('\n')) {
+        formattedLines.add(line);
+      } else {
+        formattedLines.add(line);
+      }
+    }
+
+    // Join with proper spacing
+    return formattedLines.join('\n').trim();
   }
 
   Future<void> _generateAndSaveTrip() async {
@@ -444,9 +123,16 @@ class _TripCreationScreenState extends State<TripCreationScreen> {
     final people = _peopleController.text.trim();
 
     setState(() => _isLoading = true);
-
     final prompt = '''
 Create a comprehensive, day-by-day travel itinerary for a trip to $destination from ${DateFormat('MMMM d, yyyy').format(_startDate!)} to ${DateFormat('MMMM d, yyyy').format(_endDate!)} for $people people with a budget of ₹$budget.
+
+FORMATTING REQUIREMENTS:
+- Use ## Section Headers ## for major sections
+- Use bullet points (•) for lists
+- Put each activity on its own line
+- Include blank lines between sections
+- Use emojis where appropriate (🏨 for hotels, 🚗 for transport, etc.)
+- Keep descriptions concise (1-2 sentences)
 
 STRUCTURE THE RESPONSE AS FOLLOWS:
 
@@ -465,8 +151,8 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
 [Same structure as above]
 
 ## Recommended Accommodations ##
-• [Hotel/Homestay Name] - [Price range], [Contact info], [Brief description]
-• [Second Option] - [Details]
+• [Hotel/Homestay Name] - [Price range], [Contact info (Mobile Numbers by searching from web)], [Brief description]
+ • [Second Option] - [Details]
 
 ## Travel Tips ##
 • [Tip 1]
@@ -475,20 +161,18 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
 ## Emergency Contacts ##
 • Police: [Number]
 • Hospital: [Number]
-
-Include relevant emojis in the response where appropriate (🏨 for hotels, 🚗 for transport, etc.).
 ''';
 
     try {
       final itinerary = await GeminiService().generateTripPlan(prompt);
-      final cleanedItinerary = cleanAndFormatItinerary(itinerary);
+      // final cleanedItinerary = cleanAndFormatItinerary(itinerary);
 
       setState(() {
-        _generatedItinerary = cleanedItinerary;
+        _generatedItinerary = itinerary;
         _isLoading = false;
       });
 
-      _showItineraryPreviewDialog(cleanedItinerary);
+      _showItineraryPreviewDialog(itinerary);
     } catch (e) {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -505,32 +189,54 @@ Include relevant emojis in the response where appropriate (🏨 for hotels, 🚗
       barrierDismissible: false,
       builder:
           (context) => Dialog(
-            insetPadding: const EdgeInsets.all(16),
+            insetPadding: const EdgeInsets.all(20),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.9,
+                maxHeight: MediaQuery.of(context).size.height * 0.8,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
                       'Your Trip Itinerary',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Destination Header
+                          ItineraryDisplayWidget(
+                            itinerary: itinerary,
+                            destination: _destinationController.text.trim(),
+                          ),
+                          const SizedBox(height: 20),
+                          // Itinerary Content
+                          if (_generatedItinerary != null)
+                            Text(
+                              _generatedItinerary!,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            )
+                          else
+                            const Text(
+                              'No itinerary content was generated.',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          const SizedBox(height: 20),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: ItineraryDisplayWidget(
-                          itinerary: itinerary,
-                          destination: _destinationController.text.trim(),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         TextButton(
@@ -561,8 +267,8 @@ Include relevant emojis in the response where appropriate (🏨 for hotels, 🚗
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -793,15 +499,27 @@ class ItineraryDisplayWidget extends StatelessWidget {
       height: 200,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        image: DecorationImage(
-          image: CachedNetworkImageProvider(
-            _getDestinationImageUrl(destination),
-          ),
-          fit: BoxFit.cover,
-        ),
+        color: Colors.grey[200],
       ),
       child: Stack(
         children: [
+          // Try Unsplash first
+          _buildNetworkImage(_getDestinationImageUrl(destination)),
+          // Fallback to secondary source if needed
+          Positioned.fill(
+            child: FutureBuilder(
+              future: _checkImageAvailability(
+                _getDestinationImageUrl(destination),
+              ),
+              builder: (context, snapshot) {
+                if (snapshot.data == false) {
+                  return _buildNetworkImage(_getFallbackImageUrl(destination));
+                }
+                return const SizedBox();
+              },
+            ),
+          ),
+          // Gradient overlay
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -827,6 +545,34 @@ class ItineraryDisplayWidget extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildNetworkImage(String url) {
+    return CachedNetworkImage(
+      imageUrl: url,
+      height: 200,
+      width: double.infinity,
+      fit: BoxFit.cover,
+      placeholder:
+          (context, url) => Container(
+            color: Colors.grey[200],
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+      errorWidget:
+          (context, url, error) => Container(
+            color: Colors.grey[200],
+            child: const Icon(Icons.image_not_supported),
+          ),
+    );
+  }
+
+  Future<bool> _checkImageAvailability(String url) async {
+    try {
+      final response = await http.head(Uri.parse(url));
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
   }
 
   Widget _buildItinerarySection(Map<String, dynamic> section) {
@@ -910,13 +656,13 @@ class ItineraryDisplayWidget extends StatelessWidget {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: CachedNetworkImage(
-                              imageUrl: activity['image']!,
-                              height: 120,
+                              imageUrl: _getDestinationImageUrl(destination),
+                              height: 200,
                               width: double.infinity,
                               fit: BoxFit.cover,
                               placeholder:
                                   (context, url) => Container(
-                                    height: 120,
+                                    height: 200,
                                     color: Colors.grey[200],
                                     child: const Center(
                                       child: CircularProgressIndicator(),
@@ -924,12 +670,28 @@ class ItineraryDisplayWidget extends StatelessWidget {
                                   ),
                               errorWidget:
                                   (context, url, error) => Container(
-                                    height: 120,
+                                    height: 200,
                                     color: Colors.grey[200],
-                                    child: const Icon(
-                                      Icons.image_not_supported,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.image_not_supported,
+                                          size: 48,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          'Could not load image',
+                                          style:
+                                              Theme.of(
+                                                context,
+                                              ).textTheme.bodySmall,
+                                        ),
+                                      ],
                                     ),
                                   ),
+                              httpHeaders: const {'User-Agent': 'RoamBot/1.0'},
                             ),
                           ),
                         ),
@@ -1046,10 +808,17 @@ class ItineraryDisplayWidget extends StatelessWidget {
   }
 
   String _getDestinationImageUrl(String destination) {
-    return 'https://source.unsplash.com/800x400/?$destination,tourism';
+    final encodedDestination = Uri.encodeComponent(destination);
+    return 'https://source.unsplash.com/featured/800x400/?$encodedDestination,tourism';
   }
 
   String _getPlaceImageUrl(String place) {
-    return 'https://source.unsplash.com/400x200/?${place.split(' ').first},landmark';
+    final encodedPlace = Uri.encodeComponent(place.split(' ').first);
+    return 'https://source.unsplash.com/featured/400x200/?$encodedPlace,landmark';
+  }
+
+  String _getFallbackImageUrl(String query) {
+    // Use a different image service as fallback
+    return 'https://picsum.photos/800/400/?$query';
   }
 }
