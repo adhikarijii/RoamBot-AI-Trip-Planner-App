@@ -133,7 +133,7 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
 
   Widget _buildSectionHeader(String title, int count) {
     return Padding(
-      padding: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.only(top: 5),
       child: Row(
         children: [
           Text(
@@ -183,7 +183,7 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 5),
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -218,7 +218,7 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 6),
+            const SizedBox(height: 5),
             Text('Dates: $dateRange'),
             Text(
               'Budget: ₹${NumberFormat().format(data['budget'] is String ? double.tryParse(data['budget']) ?? 0 : data['budget'] ?? 0)}',
@@ -386,7 +386,7 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                       (value) =>
                           setState(() => _searchQuery = value.toLowerCase()),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     _buildFilterChip(),

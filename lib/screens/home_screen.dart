@@ -254,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     ];
 
     return SizedBox(
-      height: 200,
+      height: 150,
       child: PageView.builder(
         controller: _pageController,
         onPageChanged: (index) => setState(() => _currentCarouselIndex = index),
@@ -377,7 +377,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             color: theme.colorScheme.onSurface,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 15),
         Row(
           children: [
             Expanded(
@@ -456,18 +456,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(50),
         ),
         child: Column(
           children: [
-            Icon(icon, size: 28),
-            const SizedBox(height: 8),
+            Icon(icon, size: 21),
+            const SizedBox(height: 3),
             Text(
               label,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
             ),
           ],
         ),
