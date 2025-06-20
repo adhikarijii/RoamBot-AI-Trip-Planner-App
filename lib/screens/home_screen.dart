@@ -4,12 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:roambot/commons/widgets/customConfirmationBox.dart'
     show customConfirmationBox;
-import 'package:roambot/commons/widgets/custom_elevated_buttons.dart';
+import 'package:roambot/screens/book_trips_screen.dart';
 import 'package:roambot/screens/profile_screen.dart';
 import 'package:roambot/screens/trip_creation_screen.dart';
 import 'package:roambot/screens/my_trips_screen.dart';
-import 'package:roambot/services/gemini_services.dart';
-import 'package:roambot/utils/constants.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -423,7 +421,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 label: 'Book Trips/Tours',
                 color: theme.colorScheme.tertiaryContainer,
                 onTap: () {
-                  // Navigate to Book Trip screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => BookTripScreen()),
+                  );
                 },
               ),
             ),
@@ -432,11 +433,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: _buildActionButton(
                 context,
                 icon: Icons.favorite,
-                label: 'Saved',
+                label: 'Popular Itineraries',
                 color: Colors.green.shade100,
-                onTap: () {
-                  // Navigate to saved items
-                },
+                onTap: () {},
               ),
             ),
           ],
