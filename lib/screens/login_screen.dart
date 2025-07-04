@@ -96,9 +96,9 @@ class _LoginScreenState extends State<LoginScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.blue.shade800,
-              Colors.blue.shade600,
-              Colors.blue.shade400,
+              Colors.teal.shade800,
+              Colors.teal.shade600,
+              Colors.teal.shade400,
             ],
           ),
         ),
@@ -196,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 onChanged: (value) {
                                   setState(() => rememberMe = value ?? false);
                                 },
-                                activeColor: Colors.blue.shade700,
+                                activeColor: Colors.teal.shade700,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(4),
                                 ),
@@ -226,7 +226,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: double.infinity,
                         height: 50,
                         child: customButtons(
-                          bcolor: Colors.blue.shade700,
+                          bcolor: Colors.teal.shade700,
                           child: 'Login',
                           fcolor: Colors.white,
                           onPressed: login,
@@ -301,7 +301,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Text(
                               "Sign up",
                               style: TextStyle(
-                                color: Colors.blue.shade700,
+                                color: Colors.teal.shade700,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),

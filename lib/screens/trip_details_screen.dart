@@ -114,7 +114,7 @@ class TripDetailsScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.blue[800],
+                color: Colors.teal[800],
               ),
             ),
             SizedBox(height: 8),
@@ -140,7 +140,7 @@ class TripDetailsScreen extends StatelessWidget {
               trip['destination'] ?? 'Unknown Destination',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.blue[900],
+                color: Colors.teal[900],
               ),
             ),
             SizedBox(height: 8),
@@ -167,7 +167,7 @@ class TripDetailsScreen extends StatelessWidget {
                 Expanded(
                   child: Card(
                     elevation: 2,
-                    color: Colors.blue[50],
+                    color: Colors.teal[50],
                     child: Padding(
                       padding: EdgeInsets.all(12),
                       child: Column(
@@ -176,7 +176,7 @@ class TripDetailsScreen extends StatelessWidget {
                             'Budget',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.blue[800],
+                              color: Colors.teal[800],
                             ),
                           ),
                           SizedBox(height: 4),

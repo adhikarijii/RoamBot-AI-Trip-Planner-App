@@ -29,19 +29,19 @@ class _MainScreenState extends State<MainScreen> {
       PersistentBottomNavBarItem(
         icon: Icon(Icons.home),
         title: "Home",
-        activeColorPrimary: Colors.black,
+        activeColorPrimary: Colors.teal,
         inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
         icon: Icon(Icons.library_books_outlined),
         title: "My Trips",
-        activeColorPrimary: Colors.black,
+        activeColorPrimary: Colors.teal,
         inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
         icon: Icon(Icons.person),
         title: "Profile",
-        activeColorPrimary: Colors.black,
+        activeColorPrimary: Colors.teal,
         inactiveColorPrimary: Colors.grey,
       ),
     ];

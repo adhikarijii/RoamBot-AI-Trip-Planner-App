@@ -49,9 +49,9 @@ class _SignupScreenState extends State<SignupScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.blue.shade800,
-              Colors.blue.shade600,
-              Colors.blue.shade400,
+              Colors.teal.shade800,
+              Colors.teal.shade600,
+              Colors.teal.shade400,
             ],
           ),
         ),
@@ -143,7 +143,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         width: double.infinity,
                         height: 50,
                         child: customButtons(
-                          bcolor: Colors.blue.shade700,
+                          bcolor: Colors.teal.shade700,
                           child: 'Sign Up',
                           fcolor: Colors.white,
                           onPressed: signup,
@@ -162,7 +162,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             child: Text(
                               "Login",
                               style: TextStyle(
-                                color: Colors.blue.shade700,
+                                color: Colors.teal.shade700,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),

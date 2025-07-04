@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:roambot/commons/widgets/customConfirmationBox.dart'
     show customConfirmationBox;
 import 'package:roambot/screens/book_trips_screen.dart';
+import 'package:roambot/screens/detail_itinerary.dart';
 import 'package:roambot/screens/profile_screen.dart';
 import 'package:roambot/screens/trip_creation_screen.dart';
 import 'package:roambot/screens/my_trips_screen.dart';
@@ -171,7 +172,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       backgroundColor: theme.colorScheme.background,
       appBar: AppBar(
         title: _buildUserHeader(theme),
-        backgroundColor: theme.colorScheme.primary,
+        // backgroundColor: theme.colorScheme.primary,
+        backgroundColor: Colors.teal,
+
         elevation: 0,
         centerTitle: false,
         actions: [
@@ -233,84 +236,171 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildDestinationCarousel() {
-    final popularDestinations = [
-      {
-        'image': 'assets/uttarakhand.jpeg',
-        'title': 'Uttarakhand',
-        'subtitle': 'Dev Bhoomi Uttarakhand',
-      },
-      {
-        'image': 'assets/sikkim.jpeg',
-        'title': 'Sikkim',
-        'subtitle': 'Valley of Rice',
-      },
-      {
-        'image': 'assets/spiti.jpeg',
-        'title': 'Spiti',
-        'subtitle': 'Winter Wonderland',
-      },
-    ];
+    return FutureBuilder<QuerySnapshot>(
+      future:
+          FirebaseFirestore.instance.collection('popular_destinations').get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-    return SizedBox(
-      height: 150,
-      child: PageView.builder(
-        controller: _pageController,
-        onPageChanged: (index) => setState(() => _currentCarouselIndex = index),
-        itemCount: popularDestinations.length,
-        itemBuilder: (context, index) {
-          final destination = popularDestinations[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.asset(destination['image']!, fit: BoxFit.cover),
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.7),
-                          Colors.transparent,
-                        ],
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Center(child: Text('No destinations found.'));
+        }
+
+        final destinations =
+            snapshot.data!.docs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              return {
+                'image': data['imageurl'] as String,
+                'title': data['title'] as String,
+                'subtitle': data['subtitle'] as String,
+              };
+            }).toList();
+
+        return SizedBox(
+          height: 150,
+          child: PageView.builder(
+            controller: _pageController,
+            onPageChanged:
+                (index) => setState(() => _currentCarouselIndex = index),
+            itemCount: destinations.length,
+            itemBuilder: (context, index) {
+              final destination = destinations[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.network(destination['image']!, fit: BoxFit.cover),
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            colors: [
+                              Colors.black.withOpacity(0.7),
+                              Colors.transparent,
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 16,
-                    bottom: 16,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          destination['title']!,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      Positioned(
+                        left: 16,
+                        bottom: 16,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              destination['title']!,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              destination['subtitle']!,
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.9),
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          destination['subtitle']!,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
+
+  // Widget _buildDestinationCarousel() {
+  //   final popularDestinations = [
+  //     {
+  //       'image': 'assets/uttarakhand.jpeg',
+  //       'title': 'Uttarakhand',
+  //       'subtitle': 'Dev Bhoomi Uttarakhand',
+  //     },
+  //     {
+  //       'image': 'assets/sikkim.jpeg',
+  //       'title': 'Sikkim',
+  //       'subtitle': 'Valley of Rice',
+  //     },
+  //     {
+  //       'image': 'assets/spiti.jpeg',
+  //       'title': 'Spiti',
+  //       'subtitle': 'Winter Wonderland',
+  //     },
+  //   ];
+
+  //   return SizedBox(
+  //     height: 150,
+  //     child: PageView.builder(
+  //       controller: _pageController,
+  //       onPageChanged: (index) => setState(() => _currentCarouselIndex = index),
+  //       itemCount: popularDestinations.length,
+  //       itemBuilder: (context, index) {
+  //         final destination = popularDestinations[index];
+  //         return Padding(
+  //           padding: const EdgeInsets.symmetric(horizontal: 8.0),
+  //           child: ClipRRect(
+  //             borderRadius: BorderRadius.circular(16),
+  //             child: Stack(
+  //               fit: StackFit.expand,
+  //               children: [
+  //                 Image.asset(destination['image']!, fit: BoxFit.cover),
+  //                 Container(
+  //                   decoration: BoxDecoration(
+  //                     gradient: LinearGradient(
+  //                       begin: Alignment.bottomCenter,
+  //                       end: Alignment.topCenter,
+  //                       colors: [
+  //                         Colors.black.withOpacity(0.7),
+  //                         Colors.transparent,
+  //                       ],
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 Positioned(
+  //                   left: 16,
+  //                   bottom: 16,
+  //                   child: Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     children: [
+  //                       Text(
+  //                         destination['title']!,
+  //                         style: const TextStyle(
+  //                           color: Colors.white,
+  //                           fontSize: 22,
+  //                           fontWeight: FontWeight.bold,
+  //                         ),
+  //                       ),
+  //                       Text(
+  //                         destination['subtitle']!,
+  //                         style: TextStyle(
+  //                           color: Colors.white.withOpacity(0.9),
+  //                           fontSize: 14,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
 
   Widget _buildQuoteCard(ThemeData theme) {
     return Card(
@@ -440,6 +530,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ],
         ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildActionButton(
+                context,
+                icon: Icons.explore,
+                label: 'Detail Itinerary',
+                color: theme.colorScheme.errorContainer,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => DetailItinerary()),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -484,7 +593,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 isEqualTo: FirebaseAuth.instance.currentUser?.uid ?? '',
               )
               .where('startDate', isGreaterThanOrEqualTo: Timestamp.now())
-              .orderBy('startDate', descending: true)
+              .orderBy('startDate', descending: false)
               .limit(3)
               .get(),
       builder: (context, snapshot) {
