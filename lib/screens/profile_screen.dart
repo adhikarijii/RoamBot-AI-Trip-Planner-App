@@ -40,33 +40,78 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  // Future<void> _saveProfile() async {
+  //   final uid = FirebaseAuth.instance.currentUser?.uid;
+  //   if (uid == null) return;
+
+  //   setState(() => _isSaving = true); // Show loading
+
+  //   String? imageUrl = _photoUrl;
+  //   if (_pickedImage != null) {
+  //     final ref = FirebaseStorage.instance.ref('profile_photos/$uid.jpg');
+  //     await ref.putFile(_pickedImage!);
+  //     imageUrl = await ref.getDownloadURL();
+  //   }
+
+  //   await FirebaseFirestore.instance.collection('users').doc(uid).set({
+  //     'name': _nameController.text.trim(),
+  //     'photoUrl': imageUrl,
+  //   });
+
+  //   setState(() {
+  //     _photoUrl = imageUrl;
+  //     _isSaving = false;
+  //   });
+
+  //   FocusScope.of(context).unfocus(); // Prevent black screen
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     const SnackBar(content: Text("Profile updated successfully")),
+  //   );
+  // }
+
   Future<void> _saveProfile() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
-    setState(() => _isSaving = true); // Show loading
+    setState(() => _isSaving = true);
 
     String? imageUrl = _photoUrl;
-    if (_pickedImage != null) {
-      final ref = FirebaseStorage.instance.ref('profile_photos/$uid.jpg');
-      await ref.putFile(_pickedImage!);
-      imageUrl = await ref.getDownloadURL();
+
+    try {
+      if (_pickedImage != null) {
+        final ref = FirebaseStorage.instance.ref('profile_photos/$uid.jpg');
+
+        // ✅ Upload file and wait for completion
+        final uploadTask = await ref.putFile(_pickedImage!);
+
+        // ✅ Now get the download URL
+        imageUrl = await ref.getDownloadURL();
+      }
+
+      // ✅ Save profile info to Firestore
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'name': _nameController.text.trim(),
+        'photoUrl': imageUrl,
+      });
+
+      setState(() {
+        _photoUrl = imageUrl;
+        _isSaving = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Profile updated successfully")),
+      );
+    } catch (e) {
+      setState(() => _isSaving = false);
+      debugPrint("🔥 Error saving profile: $e");
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Failed to save profile: $e")));
     }
 
-    await FirebaseFirestore.instance.collection('users').doc(uid).set({
-      'name': _nameController.text.trim(),
-      'photoUrl': imageUrl,
-    });
-
-    setState(() {
-      _photoUrl = imageUrl;
-      _isSaving = false;
-    });
-
     FocusScope.of(context).unfocus(); // Prevent black screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Profile updated successfully")),
-    );
   }
 
   Future<void> _pickImage() async {

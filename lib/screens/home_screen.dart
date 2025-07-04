@@ -226,7 +226,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 MaterialPageRoute(builder: (_) => const TripCreationScreen()),
               );
             },
-            backgroundColor: theme.colorScheme.primary,
+            // backgroundColor: theme.colorScheme.primary,
+            backgroundColor: Colors.teal,
             foregroundColor: theme.colorScheme.onPrimary,
             child: const Icon(Icons.add),
           )
