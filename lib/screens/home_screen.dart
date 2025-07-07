@@ -6,6 +6,7 @@ import 'package:roambot/commons/widgets/customConfirmationBox.dart'
     show customConfirmationBox;
 import 'package:roambot/screens/book_trips_screen.dart';
 import 'package:roambot/screens/detail_itinerary.dart';
+import 'package:roambot/screens/popular_itineraries.dart';
 import 'package:roambot/screens/profile_screen.dart';
 import 'package:roambot/screens/trip_creation_screen.dart';
 import 'package:roambot/screens/my_trips_screen.dart';
@@ -526,7 +527,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 icon: Icons.favorite,
                 label: 'Popular Itineraries',
                 color: Colors.green.shade100,
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PopularItinerariesScreen(),
+                    ),
+                  );
+                },
               ),
             ),
           ],
