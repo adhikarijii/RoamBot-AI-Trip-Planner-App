@@ -6,6 +6,7 @@ import 'package:roambot/commons/widgets/customConfirmationBox.dart'
     show customConfirmationBox;
 import 'package:roambot/screens/book_trips_screen.dart';
 import 'package:roambot/screens/detail_itinerary.dart';
+import 'package:roambot/screens/fb_page.dart';
 import 'package:roambot/screens/popular_itineraries.dart';
 import 'package:roambot/screens/profile_screen.dart';
 import 'package:roambot/screens/trip_creation_screen.dart';
@@ -204,7 +205,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-              child: _buildDestinationCarousel(),
+              // child: _buildDestinationCarousel(),
+              // child: NoticeCard(),
             ),
             const SizedBox(height: 10),
             Padding(
