@@ -100,95 +100,102 @@ class _NoticeCardState extends State<NoticeCard> {
 
     final topPosts = posts.take(5).toList();
 
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      shadowColor: Colors.black26,
-      color: Colors.white,
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(9, 5, 9, 5),
-        child: CarouselSlider.builder(
-          itemCount: topPosts.length,
-          options: CarouselOptions(
-            height: 130.h,
-            autoPlay: true,
-            autoPlayCurve: Curves.easeInOut,
-            enlargeCenterPage: true,
-            viewportFraction: 0.95,
-            autoPlayInterval: Duration(seconds: 9),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
           ),
-          itemBuilder: (context, index, realIdx) {
-            final post = topPosts[index];
-            final String message = post['message'] ?? 'No content';
-            final String time = post['created_time'] ?? '';
-            final String? imageUrl = post['full_picture'];
-            final formattedDate = DateFormat(
-              'dd MMM, yyyy – hh:mm a',
-            ).format(DateTime.parse(time).toLocal());
+          shadowColor: Colors.black26,
+          color: Colors.white,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(9, 5, 9, 5),
+            child: CarouselSlider.builder(
+              itemCount: topPosts.length,
+              options: CarouselOptions(
+                height: 130.h,
+                autoPlay: true,
+                autoPlayCurve: Curves.easeInOut,
+                enlargeCenterPage: true,
+                viewportFraction: 0.95,
+                autoPlayInterval: Duration(seconds: 9),
+                enableInfiniteScroll: false,
+              ),
+              itemBuilder: (context, index, realIdx) {
+                final post = topPosts[index];
+                final String message = post['message'] ?? 'No content';
+                final String time = post['created_time'] ?? '';
+                final String? imageUrl = post['full_picture'];
+                final formattedDate = DateFormat(
+                  'dd MMM, yyyy – hh:mm a',
+                ).format(DateTime.parse(time).toLocal());
 
-            return Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child:
-                      imageUrl != null
-                          ? CachedNetworkImage(
-                            imageUrl: imageUrl,
-                            height: 120.h,
-                            width: 100.w,
-                            fit: BoxFit.cover,
-                            placeholder:
-                                (context, url) => Shimmer.fromColors(
-                                  baseColor: Colors.grey.shade200,
-                                  highlightColor: Colors.grey.shade50,
-                                  child: Container(
-                                    height: 120.h,
-                                    width: 100.w,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                            errorWidget:
-                                (context, url, error) =>
-                                    const Icon(Icons.broken_image),
-                          )
-                          : Container(
-                            height: 100.h,
-                            width: 80.w,
-                            color: Colors.grey.shade300,
-                            child: const Icon(Icons.article_outlined),
+                return Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child:
+                          imageUrl != null
+                              ? CachedNetworkImage(
+                                imageUrl: imageUrl,
+                                height: 120.h,
+                                width: 100.w,
+                                fit: BoxFit.cover,
+                                placeholder:
+                                    (context, url) => Shimmer.fromColors(
+                                      baseColor: Colors.grey.shade200,
+                                      highlightColor: Colors.grey.shade50,
+                                      child: Container(
+                                        height: 120.h,
+                                        width: 100.w,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                errorWidget:
+                                    (context, url, error) =>
+                                        const Icon(Icons.broken_image),
+                              )
+                              : Container(
+                                height: 100.h,
+                                width: 80.w,
+                                color: Colors.grey.shade300,
+                                child: const Icon(Icons.article_outlined),
+                              ),
+                    ),
+                    SizedBox(width: 15.w),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            formattedDate,
+                            style: TextStyle(
+                              fontSize: customFontSize(context, 12),
+                              color: Colors.grey,
+                            ),
                           ),
-                ),
-                SizedBox(width: 15.w),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        formattedDate,
-                        style: TextStyle(
-                          fontSize: customFontSize(context, 12),
-                          color: Colors.grey,
-                        ),
+                          SizedBox(height: 5.h),
+                          Text(
+                            message,
+                            maxLines: 4,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: customFontSize(context, 13),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 5.h),
-                      Text(
-                        message,
-                        maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: customFontSize(context, 13),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 }

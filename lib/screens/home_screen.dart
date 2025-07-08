@@ -4,13 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:roambot/commons/widgets/customConfirmationBox.dart'
     show customConfirmationBox;
-import 'package:roambot/screens/book_trips_screen.dart';
+import 'package:roambot/screens/upcoming_trips_screen.dart';
 import 'package:roambot/screens/detail_itinerary.dart';
 import 'package:roambot/screens/fb_page.dart';
 import 'package:roambot/screens/popular_itineraries.dart';
 import 'package:roambot/screens/profile_screen.dart';
 import 'package:roambot/screens/trip_creation_screen.dart';
 import 'package:roambot/screens/my_trips_screen.dart';
+import 'package:roambot/screens/trip_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -203,11 +204,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-              // child: _buildDestinationCarousel(),
-              // child: NoticeCard(),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+            //   // child: _buildDestinationCarousel(),
+            //   // child: NoticeCard(),
+            // ),
             const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.all(12),
@@ -512,12 +513,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: _buildActionButton(
                 context,
                 icon: Icons.explore,
-                label: 'Book Trips/Tours',
+                label: 'Upcoming Trips/Tours',
                 color: theme.colorScheme.tertiaryContainer,
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => BookTripScreen()),
+                    MaterialPageRoute(builder: (_) => UpcomingTripsScreen()),
                   );
                 },
               ),
@@ -673,7 +674,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
             ...trips.map((trip) {
               final data = trip.data() as Map<String, dynamic>;
-              return _buildTripCard(data, theme);
+              return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TripDetailsScreen(trip: data),
+                    ),
+                  );
+                },
+                child: _buildTripCard(data, theme),
+              );
             }).toList(),
           ],
         );

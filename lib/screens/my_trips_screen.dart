@@ -527,7 +527,7 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListTile(
-                  title: const Text('Sort by Date'),
+                  title: Text('Sort by Date', style: TextStyle(fontSize: 16)),
                   trailing:
                       _sortBy == 'date'
                           ? Icon(
@@ -549,7 +549,10 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                   },
                 ),
                 ListTile(
-                  title: const Text('Sort by Budget'),
+                  title: const Text(
+                    'Sort by Budget',
+                    style: TextStyle(fontSize: 16),
+                  ),
                   trailing:
                       _sortBy == 'budget'
                           ? Icon(
@@ -571,7 +574,10 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                   },
                 ),
                 ListTile(
-                  title: const Text('Sort by Destination'),
+                  title: const Text(
+                    'Sort by Destination',
+                    style: TextStyle(fontSize: 16),
+                  ),
                   trailing:
                       _sortBy == 'destination'
                           ? Icon(
@@ -609,11 +615,11 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
     final isCompleted = endDate.isBefore(_currentDate);
 
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      elevation: 0,
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      elevation: 4,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade200, width: 1),
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.grey.shade500, width: 1),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -635,7 +641,7 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: isCompleted ? Colors.grey : Colors.black,
-                        fontSize: customFontSize(context, 16),
+                        fontSize: customFontSize(context, 20),
                       ),
                     ),
                   ),
