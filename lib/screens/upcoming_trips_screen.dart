@@ -72,7 +72,7 @@ class _UpcomingTripScreenState extends State<UpcomingTripsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: "Upcoming Trips"),
+      appBar: CustomAppBar(title: "Upcoming Tours"),
       body:
           isLoading
               ? buildShimmerLoader()

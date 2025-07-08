@@ -513,7 +513,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: _buildActionButton(
                 context,
                 icon: Icons.explore,
-                label: 'Upcoming Trips/Tours',
+                label: 'Tour Packages',
                 color: theme.colorScheme.tertiaryContainer,
                 onTap: () {
                   Navigator.push(
