@@ -157,11 +157,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           backgroundImage:
               (photoUrl != null && photoUrl.isNotEmpty)
                   ? NetworkImage(photoUrl)
-                  : null,
-          child:
-              (photoUrl == null || photoUrl.isEmpty)
-                  ? const Icon(Icons.person, size: 18)
-                  : null,
+                  : const AssetImage('assets/default_avatar.png')
+                      as ImageProvider,
+          // child:
+          //     (photoUrl == null || photoUrl.isEmpty)
+          //         ? const Icon(Icons.person, size: 18)
+          //         : null,
         );
       },
     );
@@ -418,7 +419,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: _buildActionButton(
                 context,
                 icon: Icons.explore,
-                label: 'Detail Itinerary',
+                label: "Customized Itinerary",
+                // label: 'Detail Itinerary',
                 color: theme.colorScheme.errorContainer,
                 onTap: () {
                   Navigator.push(

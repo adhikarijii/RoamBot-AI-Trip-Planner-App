@@ -21,9 +21,13 @@ class DetailItinerary extends StatefulWidget {
 
 class _DetailItineraryState extends State<DetailItinerary> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _destinationController = TextEditingController();
+  final TextEditingController _destinationfromController =
+      TextEditingController();
   final TextEditingController _budgetController = TextEditingController();
   final TextEditingController _peopleController = TextEditingController();
+  final TextEditingController _destinationtoController =
+      TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
   DateTime? _startDate;
   DateTime? _endDate;
@@ -118,13 +122,15 @@ class _DetailItineraryState extends State<DetailItinerary> {
       return;
     }
 
-    final destination = _destinationController.text.trim();
+    final destinationfrom = _destinationfromController.text.trim();
+    final destinationto = _destinationtoController.text.trim();
     final budget = _budgetController.text.trim();
     final people = _peopleController.text.trim();
+    final description = _descriptionController.text.trim();
 
     setState(() => _isLoading = true);
     final prompt = '''
-Create a comprehensive, day-by-day travel itinerary for a trip to $destination from ${DateFormat('MMMM d, yyyy').format(_startDate!)} to ${DateFormat('MMMM d, yyyy').format(_endDate!)} for $people people with a budget of ₹$budget.
+Create a comprehensive, day-by-day travel itinerary for a trip from $destinationfrom to $destinationto from ${DateFormat('MMMM d, yyyy').format(_startDate!)} to ${DateFormat('MMMM d, yyyy').format(_endDate!)} for $people people with a budget of ₹$budget by considering $description.
 
 FORMATTING REQUIREMENTS:
 - Use ## Section Headers ## for major sections
@@ -215,7 +221,7 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
                           // Destination Header
                           ItineraryDisplayWidget(
                             itinerary: itinerary,
-                            destination: _destinationController.text.trim(),
+                            destination: _destinationtoController.text.trim(),
                           ),
                           const SizedBox(height: 20),
                           // Itinerary Content
@@ -300,7 +306,7 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
   Future<void> _shareItinerary(String itinerary) async {
     try {
       await Share.share(
-        'Check out my trip itinerary to ${_destinationController.text.trim()}:\n\n$itinerary',
+        'Check out my trip itinerary to ${_destinationtoController.text.trim()}:\n\n$itinerary',
       );
     } catch (e) {
       if (mounted) {
@@ -315,7 +321,8 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
     try {
       await FirebaseFirestore.instance.collection('trips').add({
         'userId': currentUserId,
-        'destination': _destinationController.text.trim(),
+        'destinationFrom': _destinationfromController.text.trim(),
+        'destination': _destinationtoController.text.trim(),
         'startDate': Timestamp.fromDate(_startDate!),
         'endDate': Timestamp.fromDate(_endDate!),
         'budget': _budgetController.text.trim(),
@@ -371,20 +378,40 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
                     padding: const EdgeInsets.all(10),
                     child: Column(
                       children: [
-                        TextFormField(
-                          controller: _destinationController,
-                          decoration: InputDecoration(
-                            labelText: 'Destination',
-                            prefixIcon: const Icon(Icons.location_on),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                        Column(
+                          children: [
+                            TextFormField(
+                              controller: _destinationfromController,
+                              decoration: InputDecoration(
+                                labelText: 'Destination From',
+                                prefixIcon: const Icon(Icons.location_on),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              validator:
+                                  (value) =>
+                                      value == null || value.isEmpty
+                                          ? 'Enter destination'
+                                          : null,
                             ),
-                          ),
-                          validator:
-                              (value) =>
-                                  value == null || value.isEmpty
-                                      ? 'Enter destination'
-                                      : null,
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _destinationtoController,
+                              decoration: InputDecoration(
+                                labelText: 'Destination To',
+                                prefixIcon: const Icon(Icons.location_on),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              validator:
+                                  (value) =>
+                                      value == null || value.isEmpty
+                                          ? 'Enter destination'
+                                          : null,
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 16),
                         Row(
@@ -454,6 +481,19 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
                                   value == null || value.isEmpty
                                       ? 'Enter number of people'
                                       : null,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _descriptionController,
+                          maxLength: 250,
+                          maxLines: 3,
+                          decoration: InputDecoration(
+                            labelText: 'Any other descriotion...',
+                            prefixIcon: const Icon(Icons.description),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                         ),
                         const SizedBox(height: 24),
                         FilledButton.icon(

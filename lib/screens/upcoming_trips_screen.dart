@@ -63,6 +63,7 @@ class _UpcomingTripScreenState extends State<UpcomingTripsScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
+              elevation: 4,
               child: Container(height: 80),
             ),
           ),
@@ -77,7 +78,7 @@ class _UpcomingTripScreenState extends State<UpcomingTripsScreen> {
           isLoading
               ? buildShimmerLoader()
               : posts.isEmpty
-              ? const Center(child: Text("No upcoming trips posted yet."))
+              ? const Center(child: Text("No upcoming trips yet."))
               : ListView.builder(
                 itemCount: posts.length,
                 itemBuilder: (context, index) {

@@ -16,6 +16,8 @@ class TripEditScreen extends StatefulWidget {
 
 class _TripEditScreenState extends State<TripEditScreen> {
   late TextEditingController _destinationController;
+  late TextEditingController _destinationfromController;
+  late TextEditingController _descriptionController;
   late TextEditingController _budgetController;
   late TextEditingController _peopleController;
   DateTime? _startDate;
@@ -31,6 +33,9 @@ class _TripEditScreenState extends State<TripEditScreen> {
     );
     _budgetController = TextEditingController(text: widget.trip['budget']);
     _peopleController = TextEditingController(text: widget.trip['people']);
+    _destinationfromController = TextEditingController(
+      text: widget.trip['destinationFrom'],
+    );
     _startDate = (widget.trip['startDate'] as Timestamp).toDate();
     _endDate = (widget.trip['endDate'] as Timestamp).toDate();
     _itinerary = widget.trip['itinerary'];
