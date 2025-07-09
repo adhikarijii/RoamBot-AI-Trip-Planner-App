@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http show head;
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
+import 'package:roambot/commons/widgets/loading_screen.dart';
 import 'package:roambot/services/gemini_services.dart';
 import 'package:roambot/utils/constants.dart';
 import 'package:roambot/commons/widgets/custom_app_bar.dart';
@@ -171,16 +172,16 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
 
     try {
       final itinerary = await GeminiService().generateTripPlan(prompt);
-      // final cleanedItinerary = cleanAndFormatItinerary(itinerary);
 
-      setState(() {
-        _generatedItinerary = itinerary;
-        _isLoading = false;
-      });
+      Navigator.of(context).pop(); // close the loading screen
 
-      _showItineraryPreviewDialog(itinerary);
+      _generatedItinerary = itinerary;
+      _showItineraryPreviewDialog(
+        itinerary,
+      ); // Show dialog or navigate to another screen
     } catch (e) {
-      setState(() => _isLoading = false);
+      Navigator.of(context).pop(); // close the loading screen
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to generate itinerary: ${e.toString()}'),
@@ -365,26 +366,98 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const CustomAppBar(title: 'Plan a Trip'),
-      body:
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Form(
-                  key: _formKey,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      children: [
-                        Column(
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: const CustomAppBar(title: 'Plan a Trip'),
+          body:
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Form(
+                      key: _formKey,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
                           children: [
+                            Column(
+                              children: [
+                                TextFormField(
+                                  controller: _destinationfromController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Destination From',
+                                    prefixIcon: const Icon(Icons.location_on),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  validator:
+                                      (value) =>
+                                          value == null || value.isEmpty
+                                              ? 'Enter destination'
+                                              : null,
+                                ),
+                                const SizedBox(height: 16),
+                                TextFormField(
+                                  controller: _destinationtoController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Destination To',
+                                    prefixIcon: const Icon(Icons.location_on),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  validator:
+                                      (value) =>
+                                          value == null || value.isEmpty
+                                              ? 'Enter destination'
+                                              : null,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: () => _pickDate(context, true),
+                                    icon: const Icon(Icons.calendar_today),
+                                    label: Text(
+                                      _startDate == null
+                                          ? 'Start Date'
+                                          : DateFormat(
+                                            'MMM d, yyyy',
+                                          ).format(_startDate!),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed:
+                                        _startDate == null
+                                            ? null
+                                            : () => _pickDate(context, false),
+                                    icon: const Icon(Icons.calendar_month),
+                                    label: Text(
+                                      _endDate == null
+                                          ? 'End Date'
+                                          : DateFormat(
+                                            'MMM d, yyyy',
+                                          ).format(_endDate!),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
                             TextFormField(
-                              controller: _destinationfromController,
+                              controller: _budgetController,
+                              keyboardType: TextInputType.number,
                               decoration: InputDecoration(
-                                labelText: 'Destination From',
-                                prefixIcon: const Icon(Icons.location_on),
+                                labelText: 'Budget (₹)',
+                                prefixIcon: const Icon(Icons.currency_rupee),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -392,15 +465,16 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
                               validator:
                                   (value) =>
                                       value == null || value.isEmpty
-                                          ? 'Enter destination'
+                                          ? 'Enter budget'
                                           : null,
                             ),
                             const SizedBox(height: 16),
                             TextFormField(
-                              controller: _destinationtoController,
+                              controller: _peopleController,
+                              keyboardType: TextInputType.number,
                               decoration: InputDecoration(
-                                labelText: 'Destination To',
-                                prefixIcon: const Icon(Icons.location_on),
+                                labelText: 'Number of People',
+                                prefixIcon: const Icon(Icons.people),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -408,104 +482,37 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
                               validator:
                                   (value) =>
                                       value == null || value.isEmpty
-                                          ? 'Enter destination'
+                                          ? 'Enter number of people'
                                           : null,
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: () => _pickDate(context, true),
-                                icon: const Icon(Icons.calendar_today),
-                                label: Text(
-                                  _startDate == null
-                                      ? 'Start Date'
-                                      : DateFormat(
-                                        'MMM d, yyyy',
-                                      ).format(_startDate!),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _descriptionController,
+                              maxLength: 250,
+                              maxLines: 3,
+                              decoration: InputDecoration(
+                                labelText: 'Any other descriotion...',
+                                prefixIcon: const Icon(Icons.description),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed:
-                                    _startDate == null
-                                        ? null
-                                        : () => _pickDate(context, false),
-                                icon: const Icon(Icons.calendar_month),
-                                label: Text(
-                                  _endDate == null
-                                      ? 'End Date'
-                                      : DateFormat(
-                                        'MMM d, yyyy',
-                                      ).format(_endDate!),
-                                ),
-                              ),
+                            const SizedBox(height: 24),
+                            FilledButton.icon(
+                              icon: const Icon(Icons.flight_takeoff),
+                              label: const Text('Generate Itinerary'),
+                              onPressed: _generateAndSaveTrip,
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _budgetController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: 'Budget (₹)',
-                            prefixIcon: const Icon(Icons.currency_rupee),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          validator:
-                              (value) =>
-                                  value == null || value.isEmpty
-                                      ? 'Enter budget'
-                                      : null,
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _peopleController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: 'Number of People',
-                            prefixIcon: const Icon(Icons.people),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          validator:
-                              (value) =>
-                                  value == null || value.isEmpty
-                                      ? 'Enter number of people'
-                                      : null,
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _descriptionController,
-                          maxLength: 250,
-                          maxLines: 3,
-                          decoration: InputDecoration(
-                            labelText: 'Any other descriotion...',
-                            prefixIcon: const Icon(Icons.description),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        FilledButton.icon(
-                          icon: const Icon(Icons.flight_takeoff),
-                          label: const Text('Generate Itinerary'),
-                          onPressed: _generateAndSaveTrip,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ),
+        ),
+        // --- Custom Loader Overlay ---
+        if (_isLoading) const LoadingScreen(),
+      ],
     );
   }
 }

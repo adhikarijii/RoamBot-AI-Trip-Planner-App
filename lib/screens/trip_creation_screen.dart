@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http show head;
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
+import 'package:roambot/commons/widgets/loading_screen.dart';
 import 'package:roambot/services/gemini_services.dart';
 import 'package:roambot/utils/constants.dart';
 import 'package:roambot/commons/widgets/custom_app_bar.dart';
@@ -105,6 +106,84 @@ class _TripCreationScreenState extends State<TripCreationScreen> {
     return formattedLines.join('\n').trim();
   }
 
+  //   Future<void> _generateAndSaveTrip() async {
+  //     if (_formKey.currentState == null ||
+  //         !_formKey.currentState!.validate() ||
+  //         _startDate == null ||
+  //         _endDate == null) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(
+  //           content: Text('Please fill all fields and select dates'),
+  //         ),
+  //       );
+  //       return;
+  //     }
+
+  //     final destination = _destinationController.text.trim();
+  //     final budget = _budgetController.text.trim();
+  //     final people = _peopleController.text.trim();
+
+  //     setState(() => _isLoading = true);
+  //     final prompt = '''
+  // Create a comprehensive, day-by-day travel itinerary for a trip to $destination from ${DateFormat('MMMM d, yyyy').format(_startDate!)} to ${DateFormat('MMMM d, yyyy').format(_endDate!)} for $people people with a budget of ₹$budget.
+
+  // FORMATTING REQUIREMENTS:
+  // - Use ## Section Headers ## for major sections
+  // - Use bullet points (•) for lists
+  // - Put each activity on its own line
+  // - Include blank lines between sections
+  // - Use emojis where appropriate (🏨 for hotels, 🚗 for transport, etc.)
+  // - Keep descriptions concise (1-2 sentences)
+
+  // STRUCTURE THE RESPONSE AS FOLLOWS:
+
+  // ## Destination Overview ##
+  // [Brief 2-3 paragraph introduction about the destination]
+
+  // ## Day 1: [Day Name], [Date] ##
+  // • 08:00-09:00: Breakfast at [Place Name] - [Brief description]
+  // • 09:30-12:00: Visit [Attraction 1] - [Description, 50 words max]
+  // • 12:30-13:30: Lunch at [Restaurant] - [Cuisine type, price range]
+  // • 14:00-17:00: Activity at [Location] - [Details]
+  // • 19:00-21:00: Dinner at [Restaurant] - [Recommendation]
+  // [Include transportation notes between locations]
+
+  // ## Day 2: [Day Name], [Date] ##
+  // [Same structure as above]
+
+  // ## Recommended Accommodations ##
+  // • [Hotel/Homestay Name] - [Price range], [Contact info (Mobile Numbers by searching from web)], [Brief description]
+  //  • [Second Option] - [Details]
+
+  // ## Travel Tips ##
+  // • [Tip 1]
+  // • [Tip 2]
+
+  // ## Emergency Contacts ##
+  // • Police: [Number]
+  // • Hospital: [Number]
+  // ''';
+
+  //     try {
+  //       final itinerary = await GeminiService().generateTripPlan(prompt);
+  //       // final cleanedItinerary = cleanAndFormatItinerary(itinerary);
+
+  //       setState(() {
+  //         _generatedItinerary = itinerary;
+  //         _isLoading = false;
+  //       });
+
+  //       _showItineraryPreviewDialog(itinerary);
+  //     } catch (e) {
+  //       setState(() => _isLoading = false);
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text('Failed to generate itinerary: ${e.toString()}'),
+  //         ),
+  //       );
+  //     }
+  //   }
+
   Future<void> _generateAndSaveTrip() async {
     if (_formKey.currentState == null ||
         !_formKey.currentState!.validate() ||
@@ -122,7 +201,16 @@ class _TripCreationScreenState extends State<TripCreationScreen> {
     final budget = _budgetController.text.trim();
     final people = _peopleController.text.trim();
 
-    setState(() => _isLoading = true);
+    // Show full-screen loading screen
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        pageBuilder:
+            (_, __, ___) =>
+                const LoadingScreen(message: "Generating your itinerary..."),
+      ),
+    );
+
     final prompt = '''
 Create a comprehensive, day-by-day travel itinerary for a trip to $destination from ${DateFormat('MMMM d, yyyy').format(_startDate!)} to ${DateFormat('MMMM d, yyyy').format(_endDate!)} for $people people with a budget of ₹$budget.
 
@@ -152,7 +240,7 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
 
 ## Recommended Accommodations ##
 • [Hotel/Homestay Name] - [Price range], [Contact info (Mobile Numbers by searching from web)], [Brief description]
- • [Second Option] - [Details]
+• [Second Option] - [Details]
 
 ## Travel Tips ##
 • [Tip 1]
@@ -165,16 +253,16 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
 
     try {
       final itinerary = await GeminiService().generateTripPlan(prompt);
-      // final cleanedItinerary = cleanAndFormatItinerary(itinerary);
 
-      setState(() {
-        _generatedItinerary = itinerary;
-        _isLoading = false;
-      });
+      Navigator.of(context).pop(); // close the loading screen
 
-      _showItineraryPreviewDialog(itinerary);
+      _generatedItinerary = itinerary;
+      _showItineraryPreviewDialog(
+        itinerary,
+      ); // Show dialog or navigate to another screen
     } catch (e) {
-      setState(() => _isLoading = false);
+      Navigator.of(context).pop(); // close the loading screen
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to generate itinerary: ${e.toString()}'),
@@ -358,114 +446,120 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const CustomAppBar(title: 'Plan a Trip'),
-      body:
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Form(
-                  key: _formKey,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          controller: _destinationController,
-                          decoration: InputDecoration(
-                            labelText: 'Destination',
-                            prefixIcon: const Icon(Icons.location_on),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          validator:
-                              (value) =>
-                                  value == null || value.isEmpty
-                                      ? 'Enter destination'
-                                      : null,
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: const CustomAppBar(title: 'Plan a Trip'),
+          body:
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Form(
+                      key: _formKey,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
                           children: [
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: () => _pickDate(context, true),
-                                icon: const Icon(Icons.calendar_today),
-                                label: Text(
-                                  _startDate == null
-                                      ? 'Start Date'
-                                      : DateFormat(
-                                        'MMM d, yyyy',
-                                      ).format(_startDate!),
+                            TextFormField(
+                              controller: _destinationController,
+                              decoration: InputDecoration(
+                                labelText: 'Destination',
+                                prefixIcon: const Icon(Icons.location_on),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
+                              validator:
+                                  (value) =>
+                                      value == null || value.isEmpty
+                                          ? 'Enter destination'
+                                          : null,
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed:
-                                    _startDate == null
-                                        ? null
-                                        : () => _pickDate(context, false),
-                                icon: const Icon(Icons.calendar_month),
-                                label: Text(
-                                  _endDate == null
-                                      ? 'End Date'
-                                      : DateFormat(
-                                        'MMM d, yyyy',
-                                      ).format(_endDate!),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: () => _pickDate(context, true),
+                                    icon: const Icon(Icons.calendar_today),
+                                    label: Text(
+                                      _startDate == null
+                                          ? 'Start Date'
+                                          : DateFormat(
+                                            'MMM d, yyyy',
+                                          ).format(_startDate!),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed:
+                                        _startDate == null
+                                            ? null
+                                            : () => _pickDate(context, false),
+                                    icon: const Icon(Icons.calendar_month),
+                                    label: Text(
+                                      _endDate == null
+                                          ? 'End Date'
+                                          : DateFormat(
+                                            'MMM d, yyyy',
+                                          ).format(_endDate!),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _budgetController,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                labelText: 'Budget (₹)',
+                                prefixIcon: const Icon(Icons.currency_rupee),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
+                              validator:
+                                  (value) =>
+                                      value == null || value.isEmpty
+                                          ? 'Enter budget'
+                                          : null,
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _peopleController,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                labelText: 'Number of People',
+                                prefixIcon: const Icon(Icons.people),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              validator:
+                                  (value) =>
+                                      value == null || value.isEmpty
+                                          ? 'Enter number of people'
+                                          : null,
+                            ),
+                            const SizedBox(height: 24),
+                            FilledButton.icon(
+                              icon: const Icon(Icons.flight_takeoff),
+                              label: const Text('Generate Itinerary'),
+                              onPressed: _generateAndSaveTrip,
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _budgetController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: 'Budget (₹)',
-                            prefixIcon: const Icon(Icons.currency_rupee),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          validator:
-                              (value) =>
-                                  value == null || value.isEmpty
-                                      ? 'Enter budget'
-                                      : null,
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _peopleController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: 'Number of People',
-                            prefixIcon: const Icon(Icons.people),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          validator:
-                              (value) =>
-                                  value == null || value.isEmpty
-                                      ? 'Enter number of people'
-                                      : null,
-                        ),
-                        const SizedBox(height: 24),
-                        FilledButton.icon(
-                          icon: const Icon(Icons.flight_takeoff),
-                          label: const Text('Generate Itinerary'),
-                          onPressed: _generateAndSaveTrip,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ),
+        ),
+        // --- Custom Loader Overlay ---
+        if (_isLoading) const LoadingScreen(),
+      ],
     );
   }
 }

@@ -46,6 +46,7 @@ dependencies:
   firebase_storage: ^12.4.5
   share_plus: ^11.0.0
   cached_network_image: ^3.4.1
+  lottie: ^3.3.1
 
   
   # The following adds the Cupertino Icons font to your application.
@@ -58,6 +59,8 @@ dependencies:
   flutter_screenutil: ^5.9.3
   carousel_slider: ^5.1.1
   shimmer: ^3.0.0
+  path_drawing: ^1.0.1
+  flutter_svg: ^2.2.0
 
 dev_dependencies:
   flutter_test:
@@ -96,6 +99,7 @@ flutter:
   # flutter:
   assets:
     - assets/
+    - assets/animation/
     - assets/images/
     - assets/fonts/
     - assets/icon/
