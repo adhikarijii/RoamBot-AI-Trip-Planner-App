@@ -32,7 +32,7 @@ RoamBot values your privacy. Here's how we handle your data:
           'Terms Of Use',
           style: const TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.teal,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

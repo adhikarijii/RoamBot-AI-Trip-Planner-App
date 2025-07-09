@@ -27,7 +27,7 @@ Developed by Rahul Singh Adhikari
           'About RoamBot',
           style: const TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.teal,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

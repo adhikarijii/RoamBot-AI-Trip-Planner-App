@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:roambot/screens/home_screen.dart';
-import 'package:roambot/screens/profile_screen.dart';
 import 'package:roambot/screens/my_trips_screen.dart';
 import 'package:roambot/screens/user_profile_screen.dart';
 
@@ -33,7 +32,7 @@ class _MainScreenState extends State<MainScreen> {
         inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
-        icon: Icon(Icons.library_books_outlined),
+        icon: Icon(Icons.luggage),
         title: "My Trips",
         activeColorPrimary: Colors.teal,
         inactiveColorPrimary: Colors.grey,

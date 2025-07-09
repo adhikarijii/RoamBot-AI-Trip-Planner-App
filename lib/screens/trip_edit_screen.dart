@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:roambot/commons/widgets/loading_screen.dart';
 import 'package:roambot/services/gemini_services.dart';
 import 'package:roambot/commons/widgets/custom_app_bar.dart';
 
@@ -199,120 +200,130 @@ Make the itinerary practical, realistic, and optimized for time and budget const
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(title: 'Edit Trip'),
-      body:
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    children: [
-                      TextField(
-                        controller: _destinationController,
-                        decoration: InputDecoration(
-                          labelText: 'Destination',
-                          prefixIcon: const Icon(Icons.location_on_outlined),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: CustomAppBar(title: 'Edit Trip'),
+          body:
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
                         children: [
-                          Expanded(
-                            child: OutlinedButton.icon(
-                              icon: const Icon(Icons.calendar_today),
-                              label: Text(
-                                _startDate == null
-                                    ? 'Start Date'
-                                    : DateFormat(
-                                      'MMM d, yyyy',
-                                    ).format(_startDate!),
+                          TextField(
+                            controller: _destinationController,
+                            decoration: InputDecoration(
+                              labelText: 'Destination',
+                              prefixIcon: const Icon(
+                                Icons.location_on_outlined,
                               ),
-                              onPressed: () => _pickDate(context, true),
-                              style: OutlinedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: OutlinedButton.icon(
-                              icon: const Icon(Icons.event),
-                              label: Text(
-                                _endDate == null
-                                    ? 'End Date'
-                                    : DateFormat(
-                                      'MMM d, yyyy',
-                                    ).format(_endDate!),
-                              ),
-                              onPressed:
-                                  _startDate == null
-                                      ? null
-                                      : () => _pickDate(context, false),
-                              style: OutlinedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  icon: const Icon(Icons.calendar_today),
+                                  label: Text(
+                                    _startDate == null
+                                        ? 'Start Date'
+                                        : DateFormat(
+                                          'MMM d, yyyy',
+                                        ).format(_startDate!),
+                                  ),
+                                  onPressed: () => _pickDate(context, true),
+                                  style: OutlinedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
                                 ),
                               ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  icon: const Icon(Icons.event),
+                                  label: Text(
+                                    _endDate == null
+                                        ? 'End Date'
+                                        : DateFormat(
+                                          'MMM d, yyyy',
+                                        ).format(_endDate!),
+                                  ),
+                                  onPressed:
+                                      _startDate == null
+                                          ? null
+                                          : () => _pickDate(context, false),
+                                  style: OutlinedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          TextField(
+                            controller: _budgetController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              labelText: 'Budget (₹)',
+                              prefixIcon: const Icon(
+                                Icons.currency_rupee_outlined,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
+                          ),
+                          const SizedBox(height: 16),
+                          TextField(
+                            controller: _peopleController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              labelText: 'People',
+                              prefixIcon: const Icon(Icons.people_outline),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 28),
+                          // SizedBox(
+                          //   width: double.infinity,
+                          //   child: ElevatedButton.icon(
+                          //     icon: const Icon(Icons.auto_fix_high_outlined),
+                          //     label: const Text('Regenerate Itinerary'),
+                          //     style: ElevatedButton.styleFrom(
+                          //       padding: const EdgeInsets.symmetric(vertical: 14),
+                          //       shape: RoundedRectangleBorder(
+                          //         borderRadius: BorderRadius.circular(12),
+                          //       ),
+                          //     ),
+                          //     onPressed: _regenerateItinerary,
+                          //   ),
+                          // ),
+                          FilledButton.icon(
+                            icon: const Icon(Icons.auto_fix_high_outlined),
+                            label: const Text('Regenerate Itinerary'),
+                            onPressed: _regenerateItinerary,
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: _budgetController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: 'Budget (₹)',
-                          prefixIcon: const Icon(Icons.currency_rupee_outlined),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: _peopleController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: 'People',
-                          prefixIcon: const Icon(Icons.people_outline),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 28),
-                      // SizedBox(
-                      //   width: double.infinity,
-                      //   child: ElevatedButton.icon(
-                      //     icon: const Icon(Icons.auto_fix_high_outlined),
-                      //     label: const Text('Regenerate Itinerary'),
-                      //     style: ElevatedButton.styleFrom(
-                      //       padding: const EdgeInsets.symmetric(vertical: 14),
-                      //       shape: RoundedRectangleBorder(
-                      //         borderRadius: BorderRadius.circular(12),
-                      //       ),
-                      //     ),
-                      //     onPressed: _regenerateItinerary,
-                      //   ),
-                      // ),
-                      FilledButton.icon(
-                        icon: const Icon(Icons.auto_fix_high_outlined),
-                        label: const Text('Regenerate Itinerary'),
-                        onPressed: _regenerateItinerary,
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+        ),
+        // --- Custom Loader Overlay ---
+        if (_isLoading) const LoadingScreen(),
+      ],
     );
   }
 }

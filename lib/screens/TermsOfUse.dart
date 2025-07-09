@@ -32,7 +32,7 @@ By using RoamBot, you agree to the following Terms of Use:
           'Terms Of Use',
           style: const TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.teal,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

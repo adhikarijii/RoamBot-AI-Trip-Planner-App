@@ -102,6 +102,7 @@ flutter:
     - assets/animation/
     - assets/images/
     - assets/fonts/
+    - assets/fonts/NotoSans-Regular.ttf
     - assets/icon/
     - assets/icon/app_icon.png
     - assets/default_avatar.png
