@@ -12,6 +12,8 @@ import 'package:roambot/screens/profile_screen.dart';
 import 'package:roambot/screens/trip_creation_screen.dart';
 import 'package:roambot/screens/my_trips_screen.dart';
 import 'package:roambot/screens/trip_details_screen.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -37,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     )..repeat();
     _loadProfile();
     // _loadTravelQuote();
-    _startCarouselTimer();
+    // _startCarouselTimer();
   }
 
   @override
@@ -47,25 +49,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void _startCarouselTimer() {
-    Future.delayed(const Duration(seconds: 5), () {
-      if (_pageController.hasClients) {
-        if (_currentCarouselIndex < 2) {
-          _pageController.nextPage(
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-        } else {
-          _pageController.animateToPage(
-            0,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-        }
-        _startCarouselTimer();
-      }
-    });
-  }
+  // void _startCarouselTimer() {
+  //   Future.delayed(const Duration(seconds: 5), () {
+  //     if (_pageController.hasClients) {
+  //       if (_currentCarouselIndex < 2) {
+  //         _pageController.nextPage(
+  //           duration: const Duration(milliseconds: 500),
+  //           curve: Curves.easeInOut,
+  //         );
+  //       } else {
+  //         _pageController.animateToPage(
+  //           0,
+  //           duration: const Duration(milliseconds: 500),
+  //           curve: Curves.easeInOut,
+  //         );
+  //       }
+  //       _startCarouselTimer();
+  //     }
+  //   });
+  // }
 
   Future<void> _loadProfile() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -205,12 +207,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Padding(
-            //   padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-            //   // child: _buildDestinationCarousel(),
-            //   // child: NoticeCard(),
-            // ),
             const SizedBox(height: 10),
+            InkWell(
+              child: NoticeCard(),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => UpcomingTripsScreen()),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
@@ -328,139 +335,333 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  // Widget _buildQuickActions(BuildContext context, ThemeData theme) {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.stretch,
+  //     children: [
+  //       Text(
+  //         'Plan Your Next Adventure',
+  //         style: TextStyle(
+  //           fontSize: 18,
+  //           fontWeight: FontWeight.bold,
+  //           color: theme.colorScheme.onSurface,
+  //         ),
+  //       ),
+  //       const SizedBox(height: 15),
+  //       Row(
+  //         children: [
+  //           Expanded(
+  //             child: _buildGlassActionButton(
+  //               context,
+  //               icon: Icons.flight_takeoff,
+  //               label: 'New Trip',
+  //               // color: theme.colorScheme.primaryContainer,
+  //               onTap: () {
+  //                 Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(
+  //                     builder: (_) => const TripCreationScreen(),
+  //                   ),
+  //                 );
+  //               },
+  //             ),
+  //           ),
+  //           const SizedBox(width: 12),
+  //           Expanded(
+  //             child: _buildGlassActionButton(
+  //               context,
+  //               icon: Icons.map,
+  //               label: 'My Trips',
+  //               // color: theme.colorScheme.secondaryContainer,
+  //               onTap: () {
+  //                 Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(builder: (_) => const MyTripsScreen()),
+  //                 );
+  //               },
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       const SizedBox(height: 12),
+  //       Row(
+  //         children: [
+  //           Expanded(
+  //             child: _buildGlassActionButton(
+  //               context,
+  //               icon: Icons.explore,
+  //               label: 'Tour Packages',
+  //               // color: theme.colorScheme.tertiaryContainer,
+  //               onTap: () {
+  //                 Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(builder: (_) => UpcomingTripsScreen()),
+  //                 );
+  //               },
+  //             ),
+  //           ),
+  //           const SizedBox(width: 12),
+  //           Expanded(
+  //             child: _buildGlassActionButton(
+  //               context,
+  //               icon: Icons.favorite,
+  //               label: 'Popular Itineraries',
+  //               // color: Colors.green.shade100,
+  //               onTap: () {
+  //                 Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(
+  //                     builder: (_) => PopularItinerariesScreen(),
+  //                   ),
+  //                 );
+  //               },
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       const SizedBox(height: 12),
+  //       Row(
+  //         children: [
+  //           Expanded(
+  //             child: _buildGlassActionButton(
+  //               context,
+  //               icon: Icons.explore,
+  //               label: "Customized Itinerary",
+  //               // label: 'Detail Itinerary',
+  //               // color: theme.colorScheme.errorContainer,
+  //               onTap: () {
+  //                 Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(builder: (_) => DetailItinerary()),
+  //                 );
+  //               },
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ],
+  //   );
+  // }
   Widget _buildQuickActions(BuildContext context, ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          'Plan Your Next Adventure',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: theme.colorScheme.onSurface,
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [
+            Color.fromARGB(255, 15, 39, 28),
+            Color.fromARGB(255, 32, 67, 58),
+            Color.fromARGB(255, 44, 100, 89),
+          ],
+          //  colors: [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
-        ),
-        const SizedBox(height: 15),
-        Row(
-          children: [
-            Expanded(
-              child: _buildActionButton(
-                context,
-                icon: Icons.flight_takeoff,
-                label: 'New Trip',
-                color: theme.colorScheme.primaryContainer,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const TripCreationScreen(),
-                    ),
-                  );
-                },
-              ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Plan Your Next Adventure',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildActionButton(
-                context,
-                icon: Icons.map,
-                label: 'My Trips',
-                color: theme.colorScheme.secondaryContainer,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MyTripsScreen()),
-                  );
-                },
+          ),
+          const SizedBox(height: 20),
+
+          Row(
+            children: [
+              Expanded(
+                child: _buildGlassActionButton(
+                  context,
+                  icon: Icons.flight_takeoff,
+                  label: 'New Trip',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const TripCreationScreen(),
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _buildActionButton(
-                context,
-                icon: Icons.explore,
-                label: 'Tour Packages',
-                color: theme.colorScheme.tertiaryContainer,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => UpcomingTripsScreen()),
-                  );
-                },
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildGlassActionButton(
+                  context,
+                  icon: Icons.map,
+                  label: 'My Trips',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const MyTripsScreen()),
+                    );
+                  },
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildActionButton(
-                context,
-                icon: Icons.favorite,
-                label: 'Popular Itineraries',
-                color: Colors.green.shade100,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => PopularItinerariesScreen(),
-                    ),
-                  );
-                },
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          Row(
+            children: [
+              Expanded(
+                child: _buildGlassActionButton(
+                  context,
+                  icon: Icons.explore,
+                  label: 'Tour Packages',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => UpcomingTripsScreen()),
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _buildActionButton(
-                context,
-                icon: Icons.explore,
-                label: "Customized Itinerary",
-                // label: 'Detail Itinerary',
-                color: theme.colorScheme.errorContainer,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => DetailItinerary()),
-                  );
-                },
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildGlassActionButton(
+                  context,
+                  icon: Icons.favorite,
+                  label: 'Popular Itineraries',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PopularItinerariesScreen(),
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          Row(
+            children: [
+              Expanded(
+                child: _buildGlassActionButton(
+                  context,
+                  icon: Icons.auto_fix_high,
+                  label: "Customized Itinerary",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => DetailItinerary()),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildActionButton(
+  // Widget _buildActionButton(
+  //   BuildContext context, {
+  //   required IconData icon,
+  //   required String label,
+  //   required Color color,
+  //   required VoidCallback onTap,
+  // }) {
+  //   return Material(
+  //     color: color,
+  //     borderRadius: BorderRadius.circular(16),
+  //     elevation: 3,
+  //     shadowColor: Colors.black26,
+  //     child: InkWell(
+  //       onTap: onTap,
+  //       borderRadius: BorderRadius.circular(16),
+  //       splashColor: Colors.white24,
+  //       highlightColor: Colors.white10,
+  //       child: Container(
+  //         width: 80,
+  //         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+  //         decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
+  //         child: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             Icon(icon, size: 26, color: Colors.black),
+  //             const SizedBox(height: 6),
+  //             Text(
+  //               label,
+  //               textAlign: TextAlign.center,
+  //               style: const TextStyle(
+  //                 fontSize: 13,
+  //                 fontWeight: FontWeight.w600,
+  //                 color: Colors.black,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  Widget _buildGlassActionButton(
     BuildContext context, {
     required IconData icon,
     required String label,
-    required Color color,
     required VoidCallback onTap,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(50),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, size: 21),
-            const SizedBox(height: 3),
-            Text(
-              label,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        child: GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: 90,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Colors.white.withOpacity(0.12),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.2),
+                width: 1.2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-          ],
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 26, color: Colors.white),
+                const SizedBox(height: 6),
+                Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
