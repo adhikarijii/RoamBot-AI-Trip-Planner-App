@@ -1,4 +1,5 @@
 🌍 RoamBot – AI-Powered Travel Planner
+
 A smart, cross-platform mobile app that helps users plan customized travel itineraries using AI — built with Flutter and Gemini AI.
 
 ✨ Overview
