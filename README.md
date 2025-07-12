@@ -39,18 +39,25 @@ Built using modern Flutter UI principles with persistent bottom navigation, cust
 🛠️ Tech Stack
 
 Frontend: Flutter, Dart
+
 AI Integration: Gemini API
+
 Backend & Storage: Firebase Auth, Firestore, Firebase Storage
+
 APIs: Facebook Graph API
+
 Tools: Xcode (for iOS testing), Git, VS Code
 
 📌 Status
 
 ✅ Core features implemented
+
 🧪 Currently under testing and optimization
+
 🚫 Not deployed yet (targeting future release to Play Store and App Store)
 
 🔗 Connect
 
 👨‍💻 Built by Rahul Singh Adhikari
+
 📫 For collaborations, suggestions, or feedback — feel free to reach out!
