@@ -34,6 +34,7 @@ dependencies:
   printing: ^5.14.2
   open_file: ^3.5.10
   path_provider: ^2.1.5
+  permission_handler: ^12.0.0+1
   firebase_core: ^3.13.0
   firebase_auth: ^5.5.2
   cloud_firestore: ^5.6.6
@@ -47,6 +48,7 @@ dependencies:
   share_plus: ^11.0.0
   cached_network_image: ^3.4.1
   lottie: ^3.3.1
+  url_launcher: ^6.3.1
 
   
   # The following adds the Cupertino Icons font to your application.
@@ -103,6 +105,7 @@ flutter:
     - assets/images/
     - assets/fonts/
     - assets/fonts/NotoSans-Regular.ttf
+    - assets/fonts/NotoColorEmoji-Regular.ttf
     - assets/icon/
     - assets/icon/app_icon.png
     - assets/default_avatar.png

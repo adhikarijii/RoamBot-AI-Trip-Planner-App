@@ -57,8 +57,8 @@ class _NoticeCardState extends State<NoticeCard> {
 
   Widget buildShimmerLoader() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade200,
-      highlightColor: Colors.grey.shade50,
+      baseColor: const Color(0xFF1A2327),
+      highlightColor: const Color.fromARGB(255, 27, 58, 36),
       child: Row(
         children: [
           Container(
@@ -104,7 +104,7 @@ class _NoticeCardState extends State<NoticeCard> {
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       shadowColor: Colors.black26,
-      color: Colors.white,
+      color: const Color(0xFF1A2327).withOpacity(0.8),
       child: Padding(
         padding: EdgeInsets.fromLTRB(9, 5, 9, 5),
         child: CarouselSlider.builder(
@@ -180,6 +180,7 @@ class _NoticeCardState extends State<NoticeCard> {
                         style: TextStyle(
                           fontSize: customFontSize(context, 13),
                           fontWeight: FontWeight.w500,
+                          color: Colors.white,
                         ),
                       ),
                     ],
