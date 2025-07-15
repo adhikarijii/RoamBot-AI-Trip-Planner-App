@@ -104,7 +104,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
           color: Colors.white,
         ),
       ],
-      backgroundColor: Colors.teal,
+      backgroundColor: const Color(0xFF1A2327),
       elevation: 4,
     );
   }

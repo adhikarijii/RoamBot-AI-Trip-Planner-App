@@ -95,7 +95,8 @@ class _NoticeCardState extends State<NoticeCard> {
     }
 
     if (posts.isEmpty) {
-      return const Center(child: Text('No recent posts.'));
+      // return const Center(child: Text('No recent posts.'));
+      return const SizedBox.shrink();
     }
 
     final topPosts = posts.take(5).toList();

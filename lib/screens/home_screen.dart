@@ -129,6 +129,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  String _getCountdownString(Timestamp? startTimestamp) {
+    if (startTimestamp == null) return 'Starts soon';
+    final now = DateTime.now();
+    final start = startTimestamp.toDate();
+    final diff = start.difference(now);
+
+    if (diff.isNegative) return 'Started';
+
+    final days = diff.inDays;
+    final hours = diff.inHours % 24;
+    final minutes = diff.inMinutes % 60;
+
+    if (days > 0) {
+      return 'Starts in: $days day${days == 1 ? '' : 's'} $hours hr';
+    } else if (hours > 0) {
+      return 'Starts in: $hours hr $minutes min';
+    } else {
+      return 'Starts in: $minutes min';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -618,10 +639,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       data['destination'] ?? 'Unknown',
                       style: TextStyle(color: colors.text),
                     ),
-                    subtitle: Text(
-                      '${_formatDate(data['startDate'])} - ${_formatDate(data['endDate'])}',
-                      style: TextStyle(color: colors.text.withOpacity(0.6)),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${_formatDate(data['startDate'])} - ${_formatDate(data['endDate'])}',
+                          style: TextStyle(color: colors.text.withOpacity(0.6)),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _getCountdownString(data['startDate']),
+                          style: TextStyle(
+                            color: colors.primary.withOpacity(0.9),
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ),
+
                     trailing: Icon(Icons.chevron_right, color: colors.icon),
                     onTap:
                         () => Navigator.push(

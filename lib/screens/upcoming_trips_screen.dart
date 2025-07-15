@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:roambot/commons/trip_postcard.dart';
@@ -56,15 +57,16 @@ class _UpcomingTripScreenState extends State<UpcomingTripsScreen> {
       itemCount: 3,
       itemBuilder:
           (context, index) => Shimmer.fromColors(
-            baseColor: Colors.grey.shade300,
-            highlightColor: Colors.grey.shade100,
+            baseColor: Colors.grey.shade800,
+            highlightColor: Colors.grey.shade700,
             child: Card(
+              color: Colors.transparent,
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
               ),
-              elevation: 4,
-              child: Container(height: 80),
+              elevation: 6,
+              child: Container(height: 100),
             ),
           ),
     );
@@ -72,19 +74,93 @@ class _UpcomingTripScreenState extends State<UpcomingTripsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final glassColors = GlassColors.dark();
+
     return Scaffold(
-      appBar: CustomAppBar(title: "Upcoming Tours"),
-      body:
+      extendBodyBehindAppBar: true,
+      backgroundColor: glassColors.background,
+      appBar: const CustomAppBar(title: "Upcoming Tours"),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [glassColors.glassStart, glassColors.glassEnd],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(color: Colors.black.withOpacity(0.3)),
+          ),
           isLoading
               ? buildShimmerLoader()
               : posts.isEmpty
-              ? const Center(child: Text("No upcoming trips yet."))
+              ? Center(
+                child: Text(
+                  "No upcoming trips yet.",
+                  style: TextStyle(color: glassColors.text, fontSize: 16),
+                ),
+              )
               : ListView.builder(
+                padding: const EdgeInsets.only(top: 12, bottom: 24),
                 itemCount: posts.length,
                 itemBuilder: (context, index) {
                   return TripPostCard(post: posts[index]);
                 },
               ),
+        ],
+      ),
+    );
+  }
+}
+
+class GlassColors {
+  final Color background;
+  final Color appBar;
+  final Color primary;
+  final Color onPrimary;
+  final Color text;
+  final Color icon;
+  final Color glassStart;
+  final Color glassEnd;
+  final Color glassBorder;
+  final Color glassButton;
+  final Color shadow;
+
+  GlassColors({
+    required this.background,
+    required this.appBar,
+    required this.primary,
+    required this.onPrimary,
+    required this.text,
+    required this.icon,
+    required this.glassStart,
+    required this.glassEnd,
+    required this.glassBorder,
+    required this.glassButton,
+    required this.shadow,
+  });
+
+  factory GlassColors.dark() {
+    return GlassColors(
+      background: const Color(0xFF0D0F14), // Deep dark background
+      appBar: const Color(0xFF1A2327), // Dark teal app bar
+      primary: const Color(0xFF2CE0D0), // Vibrant teal
+      onPrimary: const Color(0xFF0D0F14), // Dark text for light elements
+      text: const Color(0xFFE0F3FF), // Light text
+      icon: const Color(0xFF2CE0D0), // Teal icons
+      glassStart: const Color(0xFF1A2327).withOpacity(0.8), // Dark teal glass
+      glassEnd: const Color(0xFF253A3E).withOpacity(0.6), // Lighter teal glass
+      glassBorder: const Color(
+        0xFF3FE0D0,
+      ).withOpacity(0.15), // Subtle teal border
+      glassButton: const Color(
+        0xFF1E2A2D,
+      ).withOpacity(0.4), // Dark glass buttons
+      shadow: Colors.black.withOpacity(0.5), // Deep shadows
     );
   }
 }

@@ -62,7 +62,7 @@ class _MainScreenState extends State<MainScreen> {
       hideNavigationBarWhenKeyboardAppears: true,
       // popBehaviorOnSelectedNavBarItemPress: PopActionScreensType.all,
       padding: const EdgeInsets.only(top: 8),
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF1A2327),
       isVisible: true,
       animationSettings: const NavBarAnimationSettings(
         navBarItemAnimation: ItemAnimationSettings(
