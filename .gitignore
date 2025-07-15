@@ -18,6 +18,22 @@ migrate_working_dir/
 *.iws
 .idea/
 
+# Firebase Config Files - DO NOT COMMIT
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+lib/firebase_options.dart
+lib/utils/constants.dart
+
+# API Keys / Environment Files
+.env
+.env.*
+
+# Secrets
+*.key
+*.pem
+*.jks
+
+
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
