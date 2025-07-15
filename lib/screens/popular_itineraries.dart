@@ -183,7 +183,11 @@ class PopularItinerariesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final glassColors = GlassColors.dark();
+
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: glassColors.background,
       appBar: CustomAppBar(title: 'Popular Itineraries'),
       body: ListView.builder(
         itemCount: popularTrips.length,
@@ -204,6 +208,7 @@ class PopularItinerariesScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               elevation: 4,
+              color: glassColors.appBar,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -225,6 +230,7 @@ class PopularItinerariesScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: glassColors.text,
                       ),
                     ),
                   ),
@@ -234,6 +240,54 @@ class PopularItinerariesScreen extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class GlassColors {
+  final Color background;
+  final Color appBar;
+  final Color primary;
+  final Color onPrimary;
+  final Color text;
+  final Color icon;
+  final Color glassStart;
+  final Color glassEnd;
+  final Color glassBorder;
+  final Color glassButton;
+  final Color shadow;
+
+  GlassColors({
+    required this.background,
+    required this.appBar,
+    required this.primary,
+    required this.onPrimary,
+    required this.text,
+    required this.icon,
+    required this.glassStart,
+    required this.glassEnd,
+    required this.glassBorder,
+    required this.glassButton,
+    required this.shadow,
+  });
+
+  factory GlassColors.dark() {
+    return GlassColors(
+      background: const Color(0xFF0D0F14), // Deep dark background
+      appBar: const Color(0xFF1A2327), // Dark teal app bar
+      primary: const Color(0xFF2CE0D0), // Vibrant teal
+      onPrimary: const Color(0xFF0D0F14), // Dark text for light elements
+      text: const Color(0xFFE0F3FF), // Light text
+      icon: const Color(0xFF2CE0D0), // Teal icons
+      glassStart: const Color(0xFF1A2327).withOpacity(0.8), // Dark teal glass
+      glassEnd: const Color(0xFF253A3E).withOpacity(0.6), // Lighter teal glass
+      glassBorder: const Color(
+        0xFF3FE0D0,
+      ).withOpacity(0.15), // Subtle teal border
+      glassButton: const Color(
+        0xFF1E2A2D,
+      ).withOpacity(0.4), // Dark glass buttons
+      shadow: Colors.black.withOpacity(0.5), // Deep shadows
     );
   }
 }
