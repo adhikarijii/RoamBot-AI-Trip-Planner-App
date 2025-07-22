@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:roambot/commons/widgets/custom_elevated_buttons.dart';
+import 'package:roambot/screens/forget_pass_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'signup_screen.dart';
 import 'package:roambot/utils/constants.dart';
@@ -55,6 +56,35 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // void login() async {
+  //   try {
+  //     final userCredential = await FirebaseAuth.instance
+  //         .signInWithEmailAndPassword(
+  //           email: emailController.text.trim(),
+  //           password: passwordController.text.trim(),
+  //         );
+
+  //     await _saveCredentials();
+  //     currentUserId = userCredential.user!.uid;
+
+  //     Navigator.pushAndRemoveUntil(
+  //       context,
+  //       MaterialPageRoute(builder: (_) => const AuthGate()),
+  //       (route) => false,
+  //     );
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text("Login failed: ${e.toString()}"),
+  //         behavior: SnackBarBehavior.floating,
+  //         shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.circular(10),
+  //         ),
+  //       ),
+  //     );
+  //   }
+  // }
+
   void login() async {
     try {
       final userCredential = await FirebaseAuth.instance
@@ -64,13 +94,36 @@ class _LoginScreenState extends State<LoginScreen> {
           );
 
       await _saveCredentials();
-      currentUserId = userCredential.user!.uid;
 
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const AuthGate()),
-        (route) => false,
-      );
+      final user = userCredential.user;
+      await user?.reload(); // Refresh user data
+      if (user != null && user.emailVerified) {
+        currentUserId = user.uid;
+
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const AuthGate()),
+          (route) => false,
+        );
+      } else {
+        await FirebaseAuth.instance.signOut(); // Sign out unverified user
+        showDialog(
+          context: context,
+          builder:
+              (_) => AlertDialog(
+                title: Text("Email Not Verified"),
+                content: Text(
+                  "Please check your inbox and verify your email before logging in.",
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text("OK"),
+                  ),
+                ],
+              ),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -232,7 +285,19 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: login,
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 10),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ForgotPasswordScreen(),
+                            ),
+                          );
+                        },
+                        child: Text("Forgot Password?"),
+                      ),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -295,7 +360,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => const SignupScreen(),
+                                    builder: (_) => SignupScreen(),
                                   ),
                                 ),
                             child: Text(
