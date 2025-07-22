@@ -12,6 +12,8 @@ import 'package:roambot/commons/widgets/custom_app_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:printing/printing.dart';
 import 'package:share_plus/share_plus.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class DetailItinerary extends StatefulWidget {
   const DetailItinerary({Key? key}) : super(key: key);
@@ -383,36 +385,52 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
                           children: [
                             Column(
                               children: [
-                                TextFormField(
+                                // TextFormField(
+                                //   controller: _destinationfromController,
+                                //   decoration: InputDecoration(
+                                //     labelText: 'Destination From',
+                                //     prefixIcon: const Icon(Icons.location_on),
+                                //     border: OutlineInputBorder(
+                                //       borderRadius: BorderRadius.circular(12),
+                                //     ),
+                                //   ),
+                                //   validator:
+                                //       (value) =>
+                                //           value == null || value.isEmpty
+                                //               ? 'Enter destination'
+                                //               : null,
+                                // ),
+                                DestinationSearchField(
                                   controller: _destinationfromController,
-                                  decoration: InputDecoration(
-                                    labelText: 'Destination From',
-                                    prefixIcon: const Icon(Icons.location_on),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  validator:
-                                      (value) =>
-                                          value == null || value.isEmpty
-                                              ? 'Enter destination'
-                                              : null,
+                                  onSelected: (destination) {
+                                    // already handled internally; optionally perform actions here
+                                    debugPrint("Selected: $destination");
+                                  },
+                                  labeltext: 'Destination From',
                                 ),
                                 const SizedBox(height: 16),
-                                TextFormField(
+                                // TextFormField(
+                                //   controller: _destinationtoController,
+                                //   decoration: InputDecoration(
+                                //     labelText: 'Destination To',
+                                //     prefixIcon: const Icon(Icons.location_on),
+                                //     border: OutlineInputBorder(
+                                //       borderRadius: BorderRadius.circular(12),
+                                //     ),
+                                //   ),
+                                //   validator:
+                                //       (value) =>
+                                //           value == null || value.isEmpty
+                                //               ? 'Enter destination'
+                                //               : null,
+                                // ),
+                                DestinationSearchField(
                                   controller: _destinationtoController,
-                                  decoration: InputDecoration(
-                                    labelText: 'Destination To',
-                                    prefixIcon: const Icon(Icons.location_on),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  validator:
-                                      (value) =>
-                                          value == null || value.isEmpty
-                                              ? 'Enter destination'
-                                              : null,
+                                  onSelected: (destination) {
+                                    // already handled internally; optionally perform actions here
+                                    debugPrint("Selected: $destination");
+                                  },
+                                  labeltext: 'Destination To',
                                 ),
                               ],
                             ),
@@ -867,5 +885,126 @@ class ItineraryDisplayWidget extends StatelessWidget {
   String _getFallbackImageUrl(String query) {
     // Use a different image service as fallback
     return 'https://picsum.photos/800/400/?$query';
+  }
+}
+
+Future<List<String>> fetchGeoNamesCities(String query) async {
+  final username = 'adhikari__ji'; // Replace with your GeoNames username
+  final url =
+      'http://api.geonames.org/searchJSON?name_startsWith=$query&maxRows=10&orderby=relevance&featureClass=P&username=$username';
+
+  final response = await http.get(Uri.parse(url));
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    final List names = data['geonames'];
+    return names
+        .map<String>((e) => '${e['name']}, ${e['countryName']}')
+        .toSet()
+        .toList();
+  } else {
+    return [];
+  }
+}
+
+class DestinationSearchField extends StatefulWidget {
+  final TextEditingController controller;
+  final Function(String) onSelected;
+  final String labeltext;
+
+  const DestinationSearchField({
+    super.key,
+    required this.controller,
+    required this.onSelected,
+    required this.labeltext,
+  });
+
+  @override
+  State<DestinationSearchField> createState() => _DestinationSearchFieldState();
+}
+
+class _DestinationSearchFieldState extends State<DestinationSearchField> {
+  final FocusNode _focusNode = FocusNode();
+  List<String> _suggestions = [];
+  OverlayEntry? _overlayEntry;
+
+  void _onTextChanged(String query) async {
+    if (query.isEmpty) {
+      _removeOverlay();
+      return;
+    }
+
+    final results = await fetchGeoNamesCities(query);
+    setState(() {
+      _suggestions = results;
+    });
+    _showOverlay();
+  }
+
+  void _showOverlay() {
+    _removeOverlay();
+    final overlay = Overlay.of(context);
+    final renderBox = context.findRenderObject() as RenderBox;
+    final size = renderBox.size;
+    final offset = renderBox.localToGlobal(Offset.zero);
+
+    _overlayEntry = OverlayEntry(
+      builder:
+          (_) => Positioned(
+            left: offset.dx,
+            top: offset.dy + size.height,
+            width: size.width,
+            child: Material(
+              elevation: 4,
+              child: ListView(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                children:
+                    _suggestions
+                        .map(
+                          (s) => ListTile(
+                            title: Text(s),
+                            onTap: () {
+                              widget.controller.text = s;
+                              widget.onSelected(s);
+                              _removeOverlay();
+                            },
+                          ),
+                        )
+                        .toList(),
+              ),
+            ),
+          ),
+    );
+
+    overlay.insert(_overlayEntry!);
+  }
+
+  void _removeOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _removeOverlay();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: widget.controller,
+      focusNode: _focusNode,
+      decoration: InputDecoration(
+        labelText: widget.labeltext, // ← uses externally provided label
+        prefixIcon: const Icon(Icons.location_on),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      validator:
+          (value) =>
+              value == null || value.isEmpty ? 'Enter destination' : null,
+      onChanged: _onTextChanged,
+    );
   }
 }

@@ -13,7 +13,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:printing/printing.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class TripCreationScreen extends StatefulWidget {
@@ -867,100 +866,6 @@ Future<List<String>> fetchGeoNamesCities(String query) async {
     return [];
   }
 }
-
-// class DestinationSearchField extends StatefulWidget {
-//   final Function(String) onSelected;
-
-//   const DestinationSearchField({required this.onSelected, Key? key})
-//     : super(key: key);
-
-//   @override
-//   _DestinationSearchFieldState createState() => _DestinationSearchFieldState();
-// }
-
-// class _DestinationSearchFieldState extends State<DestinationSearchField> {
-//   final TextEditingController _controller = TextEditingController();
-//   List<String> _suggestions = [];
-//   bool _isLoading = false;
-
-//   void _onChanged(String query) async {
-//     if (query.length < 2) {
-//       setState(() => _suggestions = []);
-//       return;
-//     }
-
-//     setState(() => _isLoading = true);
-//     final results = await fetchGeoNamesCities(query);
-//     setState(() {
-//       _suggestions = results;
-//       _isLoading = false;
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         TextFormField(
-//           style: const TextStyle(color: Colors.white),
-//           controller: _controller,
-//           onChanged: _onChanged,
-//           decoration: InputDecoration(
-//             labelText: 'Destination',
-//             labelStyle: const TextStyle(color: Colors.white70),
-//             filled: true,
-//             fillColor: Colors.white.withOpacity(0.1),
-//             suffixIcon:
-//                 _isLoading
-//                     ? const Padding(
-//                       padding: EdgeInsets.all(10),
-//                       child: SizedBox(
-//                         width: 16,
-//                         height: 16,
-//                         child: CircularProgressIndicator(
-//                           strokeWidth: 2,
-//                           color: Colors.white,
-//                         ),
-//                       ),
-//                     )
-//                     : const Icon(Icons.location_on, color: Colors.white),
-//             border: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(12),
-//               borderSide: BorderSide.none,
-//             ),
-//           ),
-//         ),
-//         const SizedBox(height: 4),
-//         if (_suggestions.isNotEmpty)
-//           Container(
-//             decoration: BoxDecoration(
-//               color: Colors.black.withOpacity(0.6),
-//               borderRadius: BorderRadius.circular(8),
-//             ),
-//             child: ListView.builder(
-//               shrinkWrap: true,
-//               itemCount: _suggestions.length,
-//               itemBuilder: (context, index) {
-//                 final suggestion = _suggestions[index];
-//                 return ListTile(
-//                   title: Text(
-//                     suggestion,
-//                     style: const TextStyle(color: Colors.white),
-//                   ),
-//                   onTap: () {
-//                     _controller.text = suggestion;
-//                     widget.onSelected(suggestion);
-//                     setState(() => _suggestions.clear());
-//                   },
-//                 );
-//               },
-//             ),
-//           ),
-//       ],
-//     );
-//   }
-// }
 
 class DestinationSearchField extends StatefulWidget {
   final TextEditingController controller;
