@@ -22,7 +22,7 @@ class LoadingScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Lottie.asset(
-                  'assets/animation/animation3.json',
+                  'assets/animation/Paperplane.json',
                   height: 300,
                   fit: BoxFit.contain,
                 ),

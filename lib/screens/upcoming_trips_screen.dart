@@ -77,7 +77,7 @@ class _UpcomingTripScreenState extends State<UpcomingTripsScreen> {
     final glassColors = GlassColors.dark();
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      // extendBodyBehindAppBar: true,
       backgroundColor: glassColors.background,
       appBar: const CustomAppBar(title: "Upcoming Tours"),
       body: Stack(

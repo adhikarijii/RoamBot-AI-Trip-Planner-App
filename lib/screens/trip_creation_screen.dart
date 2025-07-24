@@ -1,15 +1,14 @@
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http show head;
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:roambot/commons/widgets/loading_screen.dart';
 import 'package:roambot/services/gemini_services.dart';
 import 'package:roambot/utils/constants.dart';
 import 'package:roambot/commons/widgets/custom_app_bar.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:printing/printing.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:convert';
@@ -32,6 +31,45 @@ class _TripCreationScreenState extends State<TripCreationScreen> {
   DateTime? _endDate;
   String? _generatedItinerary;
   bool _isLoading = false;
+
+  Widget _buildGlassCard({
+    required Widget child,
+    required GlassColors colors,
+    double blurSigma = 10,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                colors.glassStart.withOpacity(0.7),
+                colors.glassEnd.withOpacity(0.4),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: colors.glassBorder.withOpacity(0.15),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: colors.shadow.withOpacity(0.2),
+                blurRadius: 20,
+                spreadRadius: -5,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
 
   Future<void> _pickDate(BuildContext context, bool isStartDate) async {
     final initialDate =
@@ -196,91 +234,133 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
   }
 
   Future<void> _showItineraryPreviewDialog(String itinerary) async {
+    final colors =
+        GlassColors.dark(); // Assuming you're using this shared theme
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder:
           (context) => Dialog(
+            backgroundColor: Colors.transparent, // To allow blurred background
             insetPadding: const EdgeInsets.all(20),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.9,
-                maxHeight: MediaQuery.of(context).size.height * 0.8,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      'Your Trip Itinerary',
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.bold),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        colors.background.withOpacity(0.4),
+                        colors.background.withOpacity(0.25),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: Colors.white.withOpacity(0.15)),
                   ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Destination Header
-                          ItineraryDisplayWidget(
-                            itinerary: itinerary,
-                            destination: _destinationController.text.trim(),
-                          ),
-                          const SizedBox(height: 20),
-                          // Itinerary Content
-                          if (_generatedItinerary != null)
-                            Text(
-                              _generatedItinerary!,
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            )
-                          else
-                            const Text(
-                              'No itinerary content was generated.',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          const SizedBox(height: 20),
-                        ],
-                      ),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.9,
+                      maxHeight: MediaQuery.of(context).size.height * 0.8,
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Edit Details'),
+                        // Title
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            'Your Trip Itinerary',
+                            style: Theme.of(
+                              context,
+                            ).textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colors.text,
+                            ),
+                          ),
                         ),
-                        Row(
-                          children: [
-                            IconButton(
-                              onPressed: () => _shareItinerary(itinerary),
-                              icon: const Icon(Icons.share),
-                              tooltip: 'Share Itinerary',
+
+                        // Itinerary content
+                        Expanded(
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ItineraryDisplayWidget(
+                                  itinerary: itinerary,
+                                  destination:
+                                      _destinationController.text.trim(),
+                                ),
+                                const SizedBox(height: 20),
+                                if (_generatedItinerary != null)
+                                  Text(
+                                    _generatedItinerary!,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(color: colors.text),
+                                  )
+                                else
+                                  Text(
+                                    'No itinerary content was generated.',
+                                    style: TextStyle(color: Colors.grey[400]),
+                                  ),
+                                const SizedBox(height: 20),
+                              ],
                             ),
-                            IconButton(
-                              onPressed: () => _printItinerary(itinerary),
-                              icon: const Icon(Icons.print),
-                              tooltip: 'Print Itinerary',
-                            ),
-                            const SizedBox(width: 8),
-                            FilledButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                _saveTrip();
-                              },
-                              child: const Text('Save Trip'),
-                            ),
-                          ],
+                          ),
+                        ),
+
+                        // Action buttons
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Edit Details'),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () => _shareItinerary(itinerary),
+                                    icon: Icon(Icons.share, color: colors.icon),
+                                    tooltip: 'Share Itinerary',
+                                  ),
+                                  IconButton(
+                                    onPressed: () => _printItinerary(itinerary),
+                                    icon: Icon(Icons.print, color: colors.icon),
+                                    tooltip: 'Print Itinerary',
+                                  ),
+                                  const SizedBox(width: 8),
+                                  FilledButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      _saveTrip();
+                                    },
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: colors.primary,
+                                      foregroundColor: colors.text,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    child: const Text('Save Trip'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -370,122 +450,164 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
 
   @override
   Widget build(BuildContext context) {
+    final colors = GlassColors.dark();
+
     return Stack(
       children: [
         Scaffold(
+          backgroundColor: colors.background,
           appBar: const CustomAppBar(title: 'Plan a Trip'),
           body:
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : SingleChildScrollView(
                     padding: const EdgeInsets.all(16),
-                    child: Form(
-                      key: _formKey,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Column(
-                          children: [
-                            // TextFormField(
-                            //   controller: _destinationController,
-                            //   decoration: InputDecoration(
-                            //     labelText: 'Destination',
-                            //     prefixIcon: const Icon(Icons.location_on),
-                            //     border: OutlineInputBorder(
-                            //       borderRadius: BorderRadius.circular(12),
-                            //     ),
-                            //   ),
-                            //   validator:
-                            //       (value) =>
-                            //           value == null || value.isEmpty
-                            //               ? 'Enter destination'
-                            //               : null,
-                            // ),
-                            DestinationSearchField(
-                              controller: _destinationController,
-                              onSelected: (destination) {
-                                // already handled internally; optionally perform actions here
-                                debugPrint("Selected: $destination");
-                              },
-                            ),
+                    child: Column(
+                      children: [
+                        _buildGlassCard(
+                          colors: colors,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                children: [
+                                  // TextFormField(
+                                  //   controller: _destinationController,
+                                  //   decoration: InputDecoration(
+                                  //     labelText: 'Destination',
+                                  //     prefixIcon: const Icon(Icons.location_on),
+                                  //     border: OutlineInputBorder(
+                                  //       borderRadius: BorderRadius.circular(12),
+                                  //     ),
+                                  //   ),
+                                  //   validator:
+                                  //       (value) =>
+                                  //           value == null || value.isEmpty
+                                  //               ? 'Enter destination'
+                                  //               : null,
+                                  // ),
+                                  DestinationSearchField(
+                                    controller: _destinationController,
+                                    onSelected: (destination) {
+                                      debugPrint("Selected: $destination");
+                                    },
+                                  ),
 
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton.icon(
-                                    onPressed: () => _pickDate(context, true),
-                                    icon: const Icon(Icons.calendar_today),
-                                    label: Text(
-                                      _startDate == null
-                                          ? 'Start Date'
-                                          : DateFormat(
-                                            'MMM d, yyyy',
-                                          ).format(_startDate!),
-                                    ),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: OutlinedButton.icon(
+                                          onPressed:
+                                              () => _pickDate(context, true),
+                                          icon: Icon(
+                                            Icons.calendar_today,
+                                            color: colors.icon,
+                                          ),
+
+                                          label: Text(
+                                            _startDate == null
+                                                ? 'Start Date'
+                                                : DateFormat(
+                                                  'MMM d, yyyy',
+                                                ).format(_startDate!),
+                                            style: TextStyle(
+                                              color: colors.text,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: OutlinedButton.icon(
+                                          onPressed:
+                                              _startDate == null
+                                                  ? null
+                                                  : () =>
+                                                      _pickDate(context, false),
+                                          icon: Icon(
+                                            Icons.calendar_month,
+                                            color: colors.icon,
+                                          ),
+                                          label: Text(
+                                            _endDate == null
+                                                ? 'End Date'
+                                                : DateFormat(
+                                                  'MMM d, yyyy',
+                                                ).format(_endDate!),
+                                            style: TextStyle(
+                                              color: colors.text,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: OutlinedButton.icon(
-                                    onPressed:
-                                        _startDate == null
-                                            ? null
-                                            : () => _pickDate(context, false),
-                                    icon: const Icon(Icons.calendar_month),
-                                    label: Text(
-                                      _endDate == null
-                                          ? 'End Date'
-                                          : DateFormat(
-                                            'MMM d, yyyy',
-                                          ).format(_endDate!),
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: _budgetController,
+                                    keyboardType: TextInputType.number,
+                                    style: TextStyle(
+                                      color: colors.text,
+                                    ), // Text input color
+                                    decoration: InputDecoration(
+                                      labelText: 'Budget (₹)',
+                                      labelStyle: TextStyle(
+                                        color: colors.icon,
+                                      ), // Label text color
+                                      prefixIcon: Icon(
+                                        Icons.currency_rupee,
+                                        color: colors.icon,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
                                     ),
+                                    validator:
+                                        (value) =>
+                                            value == null || value.isEmpty
+                                                ? 'Enter budget'
+                                                : null,
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            TextFormField(
-                              controller: _budgetController,
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                labelText: 'Budget (₹)',
-                                prefixIcon: const Icon(Icons.currency_rupee),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: _peopleController,
+                                    keyboardType: TextInputType.number,
+                                    style: TextStyle(
+                                      color: colors.text,
+                                    ), // Text input color
+                                    decoration: InputDecoration(
+                                      labelText: 'Number of People',
+                                      labelStyle: TextStyle(
+                                        color: colors.icon,
+                                      ), // Label text color
+                                      prefixIcon: Icon(
+                                        Icons.people,
+                                        color: colors.icon,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    validator:
+                                        (value) =>
+                                            value == null || value.isEmpty
+                                                ? 'Enter number of people'
+                                                : null,
+                                  ),
+                                  const SizedBox(height: 24),
+                                  FilledButton.icon(
+                                    icon: const Icon(Icons.flight_takeoff),
+                                    label: const Text('Generate Itinerary'),
+                                    onPressed: _generateAndSaveTrip,
+                                  ),
+                                ],
                               ),
-                              validator:
-                                  (value) =>
-                                      value == null || value.isEmpty
-                                          ? 'Enter budget'
-                                          : null,
                             ),
-                            const SizedBox(height: 16),
-                            TextFormField(
-                              controller: _peopleController,
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                labelText: 'Number of People',
-                                prefixIcon: const Icon(Icons.people),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              validator:
-                                  (value) =>
-                                      value == null || value.isEmpty
-                                          ? 'Enter number of people'
-                                          : null,
-                            ),
-                            const SizedBox(height: 24),
-                            FilledButton.icon(
-                              icon: const Icon(Icons.flight_takeoff),
-                              label: const Text('Generate Itinerary'),
-                              onPressed: _generateAndSaveTrip,
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
         ),
@@ -526,87 +648,6 @@ class ItineraryDisplayWidget extends StatelessWidget {
         ...sections.map((section) => _buildItinerarySection(section)),
       ],
     );
-  }
-
-  Widget _buildDestinationHeader(BuildContext context) {
-    return Container(
-      height: 200,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.grey[200],
-      ),
-      child: Stack(
-        children: [
-          // Try Unsplash first
-          // _buildNetworkImage(_getDestinationImageUrl(destination)),
-          // Fallback to secondary source if needed
-          // Positioned.fill(
-          //   child: FutureBuilder(
-          //     // future: _checkImageAvailability(
-          //     //   // _getDestinationImageUrl(destination),
-          //     // ),
-          //     // builder: (context, snapshot) {
-          //     //   if (snapshot.data == false) {
-          //     //     return _buildNetworkImage(_getFallbackImageUrl(destination));
-          //     //   }
-          //       return const SizedBox();
-          //     },
-          //   ),
-          // ),
-          // Gradient overlay
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: [Colors.black.withOpacity(0.7), Colors.transparent],
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 16,
-            left: 16,
-            child: Text(
-              destination,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNetworkImage(String url) {
-    return CachedNetworkImage(
-      imageUrl: url,
-      height: 200,
-      width: double.infinity,
-      fit: BoxFit.cover,
-      placeholder:
-          (context, url) => Container(
-            color: Colors.grey[200],
-            child: const Center(child: CircularProgressIndicator()),
-          ),
-      errorWidget:
-          (context, url, error) => Container(
-            color: Colors.grey[200],
-            child: const Icon(Icons.image_not_supported),
-          ),
-    );
-  }
-
-  Future<bool> _checkImageAvailability(String url) async {
-    try {
-      final response = await http.head(Uri.parse(url));
-      return response.statusCode == 200;
-    } catch (e) {
-      return false;
-    }
   }
 
   Widget _buildItinerarySection(Map<String, dynamic> section) {
@@ -962,15 +1003,81 @@ class _DestinationSearchFieldState extends State<DestinationSearchField> {
     return TextFormField(
       controller: widget.controller,
       focusNode: _focusNode,
+      style: TextStyle(color: Colors.white), // <-- Input text color
       decoration: InputDecoration(
         labelText: 'Destination',
-        prefixIcon: const Icon(Icons.location_on),
+        labelStyle: TextStyle(color: Color(0xFF2CE0D0)), // Label text color
+        prefixIcon: Icon(Icons.location_on, color: const Color(0xFF2CE0D0)),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
       validator:
           (value) =>
               value == null || value.isEmpty ? 'Enter destination' : null,
       onChanged: _onTextChanged,
+    );
+  }
+}
+
+class GlassColors {
+  final Color background;
+  final Color appBar;
+  final Color primary;
+  final Color onPrimary;
+  final Color text;
+  final Color icon;
+  final Color glassStart;
+  final Color glassEnd;
+  final Color glassBorder;
+  final Color glassButton;
+  final Color shadow;
+
+  GlassColors({
+    required this.background,
+    required this.appBar,
+    required this.primary,
+    required this.onPrimary,
+    required this.text,
+    required this.icon,
+    required this.glassStart,
+    required this.glassEnd,
+    required this.glassBorder,
+    required this.glassButton,
+    required this.shadow,
+  });
+
+  factory GlassColors.dark() {
+    return GlassColors(
+      background: const Color(0xFF0D0F14), // Deep dark background
+      appBar: const Color(0xFF1A2327), // Dark teal app bar
+      primary: const Color(0xFF2CE0D0), // Vibrant teal
+      onPrimary: const Color(0xFF0D0F14), // Dark text for light elements
+      text: const Color(0xFFE0F3FF), // Light text
+      icon: const Color(0xFF2CE0D0), // Teal icons
+      glassStart: const Color(0xFF1A2327).withOpacity(0.8), // Dark teal glass
+      glassEnd: const Color(0xFF253A3E).withOpacity(0.6), // Lighter teal glass
+      glassBorder: const Color(
+        0xFF3FE0D0,
+      ).withOpacity(0.15), // Subtle teal border
+      glassButton: const Color(
+        0xFF1E2A2D,
+      ).withOpacity(0.4), // Dark glass buttons
+      shadow: Colors.black.withOpacity(0.5), // Deep shadows
+    );
+  }
+
+  factory GlassColors.light() {
+    return GlassColors(
+      background: const Color(0xFFF5F7FA),
+      appBar: const Color(0x804E8C87),
+      primary: const Color(0xFF4E8C87),
+      onPrimary: Colors.white,
+      text: const Color(0xFF2D3748),
+      icon: const Color(0xFF4E8C87),
+      glassStart: const Color(0x90A5D8D3),
+      glassEnd: const Color(0x60E2F3F0),
+      glassBorder: Colors.white.withOpacity(0.4),
+      glassButton: Colors.white.withOpacity(0.3),
+      shadow: const Color(0x554A5568),
     );
   }
 }
