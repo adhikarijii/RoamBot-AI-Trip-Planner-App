@@ -513,8 +513,16 @@ class ItineraryDisplayWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildDestinationHeader(context),
-        const SizedBox(height: 16),
+        // Destination Name only, no image
+        Center(
+          child: Text(
+            destination,
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+          ),
+        ),
+        const SizedBox(height: 10),
         ...sections.map((section) => _buildItinerarySection(section)),
       ],
     );
@@ -530,21 +538,21 @@ class ItineraryDisplayWidget extends StatelessWidget {
       child: Stack(
         children: [
           // Try Unsplash first
-          _buildNetworkImage(_getDestinationImageUrl(destination)),
+          // _buildNetworkImage(_getDestinationImageUrl(destination)),
           // Fallback to secondary source if needed
-          Positioned.fill(
-            child: FutureBuilder(
-              future: _checkImageAvailability(
-                _getDestinationImageUrl(destination),
-              ),
-              builder: (context, snapshot) {
-                if (snapshot.data == false) {
-                  return _buildNetworkImage(_getFallbackImageUrl(destination));
-                }
-                return const SizedBox();
-              },
-            ),
-          ),
+          // Positioned.fill(
+          //   child: FutureBuilder(
+          //     // future: _checkImageAvailability(
+          //     //   // _getDestinationImageUrl(destination),
+          //     // ),
+          //     // builder: (context, snapshot) {
+          //     //   if (snapshot.data == false) {
+          //     //     return _buildNetworkImage(_getFallbackImageUrl(destination));
+          //     //   }
+          //       return const SizedBox();
+          //     },
+          //   ),
+          // ),
           // Gradient overlay
           Positioned.fill(
             child: Container(
@@ -676,51 +684,50 @@ class ItineraryDisplayWidget extends StatelessWidget {
                           activity['description']!,
                           style: TextStyle(color: Colors.grey[700]),
                         ),
-                      if (activity['image'] != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: CachedNetworkImage(
-                              imageUrl: _getDestinationImageUrl(destination),
-                              height: 200,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              placeholder:
-                                  (context, url) => Container(
-                                    height: 200,
-                                    color: Colors.grey[200],
-                                    child: const Center(
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                  ),
-                              errorWidget:
-                                  (context, url, error) => Container(
-                                    height: 200,
-                                    color: Colors.grey[200],
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const Icon(
-                                          Icons.image_not_supported,
-                                          size: 48,
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          'Could not load image',
-                                          style:
-                                              Theme.of(
-                                                context,
-                                              ).textTheme.bodySmall,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                              httpHeaders: const {'User-Agent': 'RoamBot/1.0'},
-                            ),
-                          ),
-                        ),
+                      // if (activity['image'] != null)
+                      //   Padding(
+                      //     padding: const EdgeInsets.only(top: 8),
+                      //     child: ClipRRect(
+                      //       borderRadius: BorderRadius.circular(8),
+                      // child: CachedNetworkImage(
+                      // imageUrl: _getDestinationImageUrl(destination),
+                      // height: 200,
+                      // width: double.infinity,
+                      // fit: BoxFit.cover,
+                      // placeholder:
+                      //     (context, url) => Container(
+                      //       height: 200,
+                      //       color: Colors.grey[200],
+                      //       child: const Center(
+                      //         child: CircularProgressIndicator(),
+                      //       ),
+                      //     ),
+                      // errorWidget:
+                      //     (context, url, error) => Container(
+                      //       height: 200,
+                      //       color: Colors.grey[200],
+                      //       child: Column(
+                      //         mainAxisAlignment:
+                      //             MainAxisAlignment.center,
+                      //         children: [
+                      //           const Icon(
+                      //             Icons.image_not_supported,
+                      //             size: 48,
+                      //           ),
+                      //           const SizedBox(height: 8),
+                      //           Text(
+                      //             'Could not load image',
+                      //             style:
+                      //                 Theme.of(
+                      //                   context,
+                      //                 ).textTheme.bodySmall,
+                      //           ),
+                      //         ],
+                      //       ),
+                      //     ),
+                      // httpHeaders: const {'User-Agent': 'RoamBot/1.0'},
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
@@ -785,7 +792,7 @@ class ItineraryDisplayWidget extends StatelessWidget {
           currentSection['activities'].add({
             'time': parts[0].trim(),
             'title': parts[1].trim(),
-            'image': _getPlaceImageUrl(parts[1].trim()),
+            // 'image': _getPlaceImageUrl(parts[1].trim()),
           });
         } else {
           if (currentSection['activities'].isNotEmpty) {
@@ -833,20 +840,20 @@ class ItineraryDisplayWidget extends StatelessWidget {
     return null;
   }
 
-  String _getDestinationImageUrl(String destination) {
-    final encodedDestination = Uri.encodeComponent(destination);
-    return 'https://source.unsplash.com/featured/800x400/?$encodedDestination,tourism';
-  }
+  // String _getDestinationImageUrl(String destination) {
+  //   final encodedDestination = Uri.encodeComponent(destination);
+  //   return 'https://source.unsplash.com/featured/800x400/?$encodedDestination,tourism';
+  // }
 
-  String _getPlaceImageUrl(String place) {
-    final encodedPlace = Uri.encodeComponent(place.split(' ').first);
-    return 'https://source.unsplash.com/featured/400x200/?$encodedPlace,landmark';
-  }
+  // String _getPlaceImageUrl(String place) {
+  //   final encodedPlace = Uri.encodeComponent(place.split(' ').first);
+  //   return 'https://source.unsplash.com/featured/400x200/?$encodedPlace,landmark';
+  // }
 
-  String _getFallbackImageUrl(String query) {
-    // Use a different image service as fallback
-    return 'https://picsum.photos/800/400/?$query';
-  }
+  // String _getFallbackImageUrl(String query) {
+  //   // Use a different image service as fallback
+  //   return 'https://picsum.photos/800/400/?$query';
+  // }
 }
 
 Future<List<String>> fetchGeoNamesCities(String query) async {
