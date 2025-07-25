@@ -234,8 +234,7 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
   }
 
   Future<void> _showItineraryPreviewDialog(String itinerary) async {
-    final colors =
-        GlassColors.dark(); // Assuming you're using this shared theme
+    final colors = GlassColors.dark();
 
     showDialog(
       context: context,
@@ -337,14 +336,14 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
                                     icon: Icon(Icons.print, color: colors.icon),
                                     tooltip: 'Print Itinerary',
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: 5),
                                   FilledButton(
                                     onPressed: () {
                                       Navigator.pop(context);
                                       _saveTrip();
                                     },
                                     style: FilledButton.styleFrom(
-                                      backgroundColor: colors.primary,
+                                      // backgroundColor: colors.primary,
                                       foregroundColor: colors.text,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(12),
@@ -639,12 +638,14 @@ class ItineraryDisplayWidget extends StatelessWidget {
         Center(
           child: Text(
             destination,
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF2CE0D0),
+            ),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 5),
         ...sections.map((section) => _buildItinerarySection(section)),
       ],
     );

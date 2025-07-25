@@ -7,7 +7,7 @@ import 'package:roambot/commons/widgets/customConfirmationBox.dart'
     show customConfirmationBox;
 import 'package:roambot/screens/fb_page.dart';
 import 'package:roambot/screens/upcoming_trips_screen.dart';
-import 'package:roambot/screens/detail_itinerary.dart';
+import 'package:roambot/screens/customized_itinerary.dart';
 import 'package:roambot/screens/popular_itineraries.dart';
 import 'package:roambot/screens/profile_screen.dart';
 import 'package:roambot/screens/trip_creation_screen.dart';

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -123,8 +124,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Widget _buildGlassCard({
+    required Widget child,
+    required GlassColors colors,
+    double blurSigma = 10,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                colors.glassStart.withOpacity(0.7),
+                colors.glassEnd.withOpacity(0.4),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: colors.glassBorder.withOpacity(0.15),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: colors.shadow.withOpacity(0.2),
+                blurRadius: 20,
+                spreadRadius: -5,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final colors = GlassColors.dark();
+
     final avatar =
         _pickedImage != null
             ? FileImage(_pickedImage!)
@@ -133,6 +175,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             : const AssetImage('assets/default_avatar.png') as ImageProvider;
 
     return Scaffold(
+      backgroundColor: colors.background,
       appBar: CustomAppBar(title: ("Edit Profile")),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -145,18 +188,90 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 20),
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: "Name"),
+              style: TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                labelText: "Name",
+                labelStyle: TextStyle(color: Color(0xFF2CE0D0)),
+              ),
             ),
             const SizedBox(height: 20),
             _isSaving
                 ? const CircularProgressIndicator()
-                : ElevatedButton(
+                : FilledButton(
                   onPressed: _saveProfile,
                   child: const Text("Save"),
                 ),
+            // : ElevatedButton(
+            //   onPressed: _saveProfile,
+            //   child: const Text("Save"),
+            // ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class GlassColors {
+  final Color background;
+  final Color appBar;
+  final Color primary;
+  final Color onPrimary;
+  final Color text;
+  final Color icon;
+  final Color glassStart;
+  final Color glassEnd;
+  final Color glassBorder;
+  final Color glassButton;
+  final Color shadow;
+
+  GlassColors({
+    required this.background,
+    required this.appBar,
+    required this.primary,
+    required this.onPrimary,
+    required this.text,
+    required this.icon,
+    required this.glassStart,
+    required this.glassEnd,
+    required this.glassBorder,
+    required this.glassButton,
+    required this.shadow,
+  });
+
+  factory GlassColors.dark() {
+    return GlassColors(
+      background: const Color(0xFF0D0F14), // Deep dark background
+      appBar: const Color(0xFF1A2327), // Dark teal app bar
+      primary: const Color(0xFF2CE0D0), // Vibrant teal
+      onPrimary: const Color(0xFF0D0F14), // Dark text for light elements
+      text: const Color(0xFFE0F3FF), // Light text
+      icon: const Color(0xFF2CE0D0), // Teal icons
+      glassStart: const Color(0xFF1A2327).withOpacity(0.8), // Dark teal glass
+      glassEnd: const Color(0xFF253A3E).withOpacity(0.6), // Lighter teal glass
+      glassBorder: const Color(
+        0xFF3FE0D0,
+      ).withOpacity(0.15), // Subtle teal border
+      glassButton: const Color(
+        0xFF1E2A2D,
+      ).withOpacity(0.4), // Dark glass buttons
+      shadow: Colors.black.withOpacity(0.5), // Deep shadows
+    );
+  }
+
+  factory GlassColors.light() {
+    return GlassColors(
+      background: const Color(0xFFF5F7FA),
+      appBar: const Color(0x804E8C87),
+      primary: const Color(0xFF4E8C87),
+      onPrimary: Colors.white,
+      text: const Color(0xFF2D3748),
+      icon: const Color(0xFF4E8C87),
+      glassStart: const Color(0x90A5D8D3),
+      glassEnd: const Color(0x60E2F3F0),
+      glassBorder: Colors.white.withOpacity(0.4),
+      glassButton: Colors.white.withOpacity(0.3),
+      shadow: const Color(0x554A5568),
     );
   }
 }

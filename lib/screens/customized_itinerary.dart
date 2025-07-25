@@ -242,91 +242,130 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
   }
 
   Future<void> _showItineraryPreviewDialog(String itinerary) async {
+    final colors = GlassColors.dark();
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder:
           (context) => Dialog(
+            backgroundColor: Colors.transparent, // To allow blurred background
             insetPadding: const EdgeInsets.all(20),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.9,
-                maxHeight: MediaQuery.of(context).size.height * 0.8,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      'Your Trip Itinerary',
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.bold),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        colors.background.withOpacity(0.4),
+                        colors.background.withOpacity(0.25),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: Colors.white.withOpacity(0.15)),
                   ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Destination Header
-                          ItineraryDisplayWidget(
-                            itinerary: itinerary,
-                            destination: _destinationtoController.text.trim(),
-                          ),
-                          const SizedBox(height: 20),
-                          // Itinerary Content
-                          if (_generatedItinerary != null)
-                            Text(
-                              _generatedItinerary!,
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            )
-                          else
-                            const Text(
-                              'No itinerary content was generated.',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          const SizedBox(height: 20),
-                        ],
-                      ),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.9,
+                      maxHeight: MediaQuery.of(context).size.height * 0.8,
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Edit Details'),
+                        // Title
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            'Your Trip Itinerary',
+                            style: Theme.of(
+                              context,
+                            ).textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colors.text,
+                            ),
+                          ),
                         ),
-                        Row(
-                          children: [
-                            IconButton(
-                              onPressed: () => _shareItinerary(itinerary),
-                              icon: const Icon(Icons.share),
-                              tooltip: 'Share Itinerary',
+                        Expanded(
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Destination Header
+                                ItineraryDisplayWidget(
+                                  itinerary: itinerary,
+                                  destination:
+                                      _destinationtoController.text.trim(),
+                                ),
+                                const SizedBox(height: 20),
+                                // Itinerary Content
+                                if (_generatedItinerary != null)
+                                  Text(
+                                    _generatedItinerary!,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(color: colors.text),
+                                  )
+                                else
+                                  Text(
+                                    'No itinerary content was generated.',
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                const SizedBox(height: 20),
+                              ],
                             ),
-                            IconButton(
-                              onPressed: () => _printItinerary(itinerary),
-                              icon: const Icon(Icons.print),
-                              tooltip: 'Print Itinerary',
-                            ),
-                            const SizedBox(width: 8),
-                            FilledButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                _saveTrip();
-                              },
-                              child: const Text('Save Trip'),
-                            ),
-                          ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Edit Details'),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () => _shareItinerary(itinerary),
+                                    icon: Icon(Icons.share, color: colors.icon),
+                                    tooltip: 'Share Itinerary',
+                                  ),
+                                  IconButton(
+                                    onPressed: () => _printItinerary(itinerary),
+                                    icon: Icon(Icons.print, color: colors.icon),
+                                    tooltip: 'Print Itinerary',
+                                  ),
+                                  const SizedBox(width: 5),
+                                  FilledButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      _saveTrip();
+                                    },
+                                    style: FilledButton.styleFrom(
+                                      // backgroundColor: colors.primary,
+                                      foregroundColor: colors.text,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    child: const Text('Save Trip'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -622,12 +661,14 @@ class ItineraryDisplayWidget extends StatelessWidget {
         Center(
           child: Text(
             destination,
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF2CE0D0),
+            ),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 5),
         ...sections.map((section) => _buildItinerarySection(section)),
       ],
     );
