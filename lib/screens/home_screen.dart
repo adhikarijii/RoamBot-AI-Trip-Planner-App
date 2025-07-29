@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:roambot/commons/widgets/customConfirmationBox.dart'
-    show customConfirmationBox;
 import 'package:roambot/screens/fb_page.dart';
+import 'package:roambot/screens/login_screen.dart';
 import 'package:roambot/screens/upcoming_trips_screen.dart';
 import 'package:roambot/screens/customized_itinerary.dart';
 import 'package:roambot/screens/popular_itineraries.dart';
@@ -57,28 +56,72 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  void _logout(BuildContext context) {
-    customConfirmationBox.show(
+  void _showLogoutConfirmation(BuildContext context) {
+    showDialog(
       context: context,
-      text: 'Are you sure you want to log out?',
-      onPressedYes: () async {
-        Navigator.of(context).pop();
-        await FirebaseAuth.instance.signOut();
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Logged out successfully'),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Icon(Icons.logout, size: 40, color: Colors.red),
+          content: const Text(
+            'Are you sure you want to log out?',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _logout(context);
+              },
+              child: const Text('Logout', style: TextStyle(color: Colors.red)),
+            ),
+          ],
         );
-        Navigator.of(
-          context,
-        ).pushNamedAndRemoveUntil('/login', (route) => false);
       },
     );
+    // customConfirmationBox.show(
+    //   context: context,
+    //   text: 'Are you sure you want to log out?',
+    //   onPressedYes: () async {
+    //     Navigator.of(context).pop();
+    //     await FirebaseAuth.instance.signOut();
+    //     if (!mounted) return;
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       SnackBar(
+    //         content: const Text('Logged out successfully'),
+    //         behavior: SnackBarBehavior.floating,
+    //         shape: RoundedRectangleBorder(
+    //           borderRadius: BorderRadius.circular(10),
+    //         ),
+    //       ),
+    //     );
+    //     Navigator.of(
+    //       context,
+    //     ).pushNamedAndRemoveUntil('/login', (route) => false);
+    //   },
+    // );
+  }
+
+  void _logout(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Logged out successfully")));
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const LoginScreen()));
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Logout failed. Please try again.")),
+      );
+    }
   }
 
   Widget _buildUserHeader(ThemeData theme) {
@@ -193,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => _logout(context),
+            onPressed: () => _showLogoutConfirmation(context),
             tooltip: 'Logout',
             color: colors.text,
           ),

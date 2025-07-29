@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:roambot/screens/login_screen.dart';
 
 class LandingScreen extends StatelessWidget {
@@ -76,17 +77,29 @@ class LandingScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 50),
 
               // App Mockup
+              // Center(
+              //   child: ClipRRect(
+              //     borderRadius: BorderRadius.circular(20),
+              //     child: Image.asset(
+              //       'assets/icon/landing1.png',
+              //       height: 370,
+              //       fit: BoxFit.contain,
+              //     ),
+              //   ),
+              // ),
               Center(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Image.asset(
-                    'assets/icon/landing1.png',
-                    height: 370,
-                    fit: BoxFit.contain,
-                  ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Lottie.asset(
+                      'assets/animation/animation4.json',
+                      height: 300,
+                      fit: BoxFit.contain,
+                    ),
+                  ],
                 ),
               ),
             ],
