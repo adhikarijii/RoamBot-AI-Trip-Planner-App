@@ -56,7 +56,7 @@ class PopularItineraryDetailScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
-        title: Text(trip['title']),
+        title: Text(trip['title'], style: TextStyle(color: colors.text)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         flexibleSpace: ClipRect(
@@ -111,23 +111,29 @@ class PopularItineraryDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     ...itinerary.map(
-                      (day) => _buildGlassCard(
-                        colors: colors,
-                        blurSigma: 8,
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(Icons.calendar_today, color: colors.primary),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  day,
-                                  style: TextStyle(color: colors.text),
+                      (day) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: _buildGlassCard(
+                          colors: colors,
+                          blurSigma: 8,
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.calendar_today,
+                                  color: colors.primary,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    day,
+                                    style: TextStyle(color: colors.text),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -144,26 +150,29 @@ class PopularItineraryDetailScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 10),
                       ...tips.map(
-                        (tip) => _buildGlassCard(
-                          colors: colors,
-                          blurSigma: 8,
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.tips_and_updates_outlined,
-                                  color: colors.primary,
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(
-                                    tip,
-                                    style: TextStyle(color: colors.text),
+                        (tip) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: _buildGlassCard(
+                            colors: colors,
+                            blurSigma: 8,
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(
+                                    Icons.tips_and_updates_outlined,
+                                    color: colors.primary,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      tip,
+                                      style: TextStyle(color: colors.text),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),

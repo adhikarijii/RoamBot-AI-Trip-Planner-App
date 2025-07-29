@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
+import 'package:animations/animations.dart';
 import 'package:roambot/screens/home_screen.dart';
 import 'package:roambot/screens/my_trips_screen.dart';
 import 'package:roambot/screens/user_profile_screen.dart';
@@ -12,72 +12,54 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  final PersistentTabController _controller = PersistentTabController(
-    initialIndex: 0,
-  );
+  int _currentIndex = 0;
 
-  List<Widget> _buildScreens() {
-    return [HomeScreen(), MyTripsScreen(), UserProfileScreen()];
-  }
-
-  List<PersistentBottomNavBarItem> _navBarsItems(
-    BuildContext context,
-    dynamic screenWidth,
-  ) {
-    return [
-      PersistentBottomNavBarItem(
-        icon: Icon(Icons.home),
-        title: "Home",
-        activeColorPrimary: Colors.teal,
-        inactiveColorPrimary: Colors.grey,
-      ),
-      PersistentBottomNavBarItem(
-        icon: Icon(Icons.luggage),
-        title: "My Trips",
-        activeColorPrimary: Colors.teal,
-        inactiveColorPrimary: Colors.grey,
-      ),
-      PersistentBottomNavBarItem(
-        icon: Icon(Icons.person),
-        title: "Profile",
-        activeColorPrimary: Colors.teal,
-        inactiveColorPrimary: Colors.grey,
-      ),
-    ];
-  }
+  final List<Widget> _screens = const [
+    HomeScreen(),
+    MyTripsScreen(),
+    UserProfileScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-
-    return PersistentTabView(
-      context,
-      controller: _controller,
-
-      screens: _buildScreens(),
-      items: _navBarsItems(context, screenWidth),
-      handleAndroidBackButtonPress: true,
-      resizeToAvoidBottomInset: true,
-      stateManagement: true,
-      hideNavigationBarWhenKeyboardAppears: true,
-      // popBehaviorOnSelectedNavBarItemPress: PopActionScreensType.all,
-      padding: const EdgeInsets.only(top: 8),
+    return Scaffold(
       backgroundColor: const Color(0xFF1A2327),
-      isVisible: true,
-      animationSettings: const NavBarAnimationSettings(
-        navBarItemAnimation: ItemAnimationSettings(
-          duration: Duration(milliseconds: 400),
-          curve: Curves.ease,
-        ),
-        screenTransitionAnimation: ScreenTransitionAnimationSettings(
-          animateTabTransition: true,
-          duration: Duration(milliseconds: 200),
-          screenTransitionAnimationType: ScreenTransitionAnimationType.fadeIn,
-        ),
+      body: PageTransitionSwitcher(
+        duration: const Duration(milliseconds: 400),
+        reverse: false,
+        transitionBuilder: (
+          Widget child,
+          Animation<double> primaryAnimation,
+          Animation<double> secondaryAnimation,
+        ) {
+          return SharedAxisTransition(
+            animation: primaryAnimation,
+            secondaryAnimation: secondaryAnimation,
+            transitionType: SharedAxisTransitionType.horizontal,
+            fillColor: const Color(0xFF1A2327),
+            child: child,
+          );
+        },
+        child: _screens[_currentIndex],
       ),
-      confineToSafeArea: true,
-      navBarHeight: 48.0,
-      navBarStyle: NavBarStyle.style13,
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF1A2327),
+        selectedItemColor: Colors.teal,
+        unselectedItemColor: Colors.grey,
+        currentIndex: _currentIndex,
+        onTap: (int index) {
+          if (_currentIndex != index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.luggage), label: "My Trips"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+        ],
+      ),
     );
   }
 }

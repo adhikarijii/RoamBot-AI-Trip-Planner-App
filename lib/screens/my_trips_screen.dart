@@ -514,6 +514,7 @@ import 'package:roambot/screens/trip_details_screen.dart';
 import 'package:roambot/screens/trip_edit_screen.dart';
 import 'package:roambot/utils/constants.dart';
 import 'package:roambot/commons/widgets/custom_app_bar.dart';
+import 'package:animations/animations.dart';
 
 class MyTripsScreen extends StatefulWidget {
   const MyTripsScreen({super.key});
@@ -706,152 +707,330 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  colors.glassStart.withOpacity(0.6),
-                  colors.glassEnd.withOpacity(0.3),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: colors.glassBorder.withOpacity(0.2),
-                width: 1,
-              ),
-            ),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(18),
-              onTap:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => TripDetailsScreen(trip: data),
+      child: OpenContainer(
+        closedElevation: 0,
+        openElevation: 0,
+        transitionDuration: const Duration(milliseconds: 500),
+        transitionType: ContainerTransitionType.fadeThrough,
+        closedColor: Colors.transparent,
+        openColor: colors.background,
+        closedShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
+        openShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(0),
+        ),
+        openBuilder: (context, _) => TripDetailsScreen(trip: data),
+        closedBuilder:
+            (context, openContainer) => GestureDetector(
+              onTap: openContainer,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          colors.glassStart.withOpacity(0.6),
+                          colors.glassEnd.withOpacity(0.3),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: colors.glassBorder.withOpacity(0.2),
+                        width: 1,
+                      ),
                     ),
-                  ),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.airplanemode_active, color: colors.icon),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            data['destination'] ?? '',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: colors.text,
-                            ),
-                          ),
-                        ),
-                        if (!isCompleted)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colors.primary.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              _getCountdownText(startDate),
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: colors.primary,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.calendar_today,
-                          size: 16,
-                          color: colors.icon,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          '${DateFormat('MMM d').format(startDate)} - ${DateFormat('MMM d, yyyy').format(endDate)}',
-                          style: TextStyle(color: colors.text.withOpacity(0.8)),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.currency_rupee,
-                          size: 16,
-                          color: colors.icon,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          '₹${data['budget']}',
-                          style: TextStyle(color: colors.text.withOpacity(0.8)),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Icon(Icons.people, size: 16, color: colors.icon),
-                        const SizedBox(width: 6),
-                        Text(
-                          '${data['people']} people',
-                          style: TextStyle(color: colors.text.withOpacity(0.8)),
-                        ),
-                      ],
-                    ),
-                    if (isEditable)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          IconButton(
-                            icon: Icon(Icons.edit, color: colors.primary),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (_) => TripEditScreen(
-                                        tripId: doc.id,
-                                        trip: data,
-                                      ),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.airplanemode_active,
+                                color: colors.icon,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  data['destination'] ?? '',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    color: colors.text,
+                                  ),
                                 ),
-                              );
-                            },
+                              ),
+                              if (!isCompleted)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: colors.primary.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    _getCountdownText(startDate),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: colors.primary,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.delete,
-                              color: Colors.red.shade400,
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.calendar_today,
+                                size: 16,
+                                color: colors.icon,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                '${DateFormat('MMM d').format(startDate)} - ${DateFormat('MMM d, yyyy').format(endDate)}',
+                                style: TextStyle(
+                                  color: colors.text.withOpacity(0.8),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.currency_rupee,
+                                size: 16,
+                                color: colors.icon,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                '${data['budget']}',
+                                style: TextStyle(
+                                  color: colors.text.withOpacity(0.8),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Icon(Icons.people, size: 16, color: colors.icon),
+                              const SizedBox(width: 6),
+                              Text(
+                                '${data['people']} people',
+                                style: TextStyle(
+                                  color: colors.text.withOpacity(0.8),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (isEditable)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.edit, color: colors.primary),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (_) => TripEditScreen(
+                                              tripId: doc.id,
+                                              trip: data,
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: Colors.red.shade400,
+                                  ),
+                                  onPressed:
+                                      () => _confirmDelete(context, doc.id),
+                                ),
+                              ],
                             ),
-                            onPressed: () => _confirmDelete(context, doc.id),
-                          ),
                         ],
                       ),
-                  ],
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
       ),
     );
   }
+
+  // Widget _buildTripCard(
+  //   QueryDocumentSnapshot doc,
+  //   bool isEditable,
+  //   GlassColors colors,
+  // ) {
+  //   final data = doc.data() as Map<String, dynamic>;
+  //   final startDate = (data['startDate'] as Timestamp).toDate();
+  //   final endDate = (data['endDate'] as Timestamp).toDate();
+  //   final isCompleted = endDate.isBefore(DateTime.now());
+
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  //     child: ClipRRect(
+  //       borderRadius: BorderRadius.circular(18),
+  //       child: BackdropFilter(
+  //         filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+  //         child: Container(
+  //           decoration: BoxDecoration(
+  //             gradient: LinearGradient(
+  //               colors: [
+  //                 colors.glassStart.withOpacity(0.6),
+  //                 colors.glassEnd.withOpacity(0.3),
+  //               ],
+  //               begin: Alignment.topLeft,
+  //               end: Alignment.bottomRight,
+  //             ),
+  //             borderRadius: BorderRadius.circular(18),
+  //             border: Border.all(
+  //               color: colors.glassBorder.withOpacity(0.2),
+  //               width: 1,
+  //             ),
+  //           ),
+  //           child: InkWell(
+  //             borderRadius: BorderRadius.circular(18),
+  //             onTap:
+  //                 () => Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(
+  //                     builder: (_) => TripDetailsScreen(trip: data),
+  //                   ),
+  //                 ),
+  //             child: Padding(
+  //               padding: const EdgeInsets.all(16),
+  //               child: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   Row(
+  //                     children: [
+  //                       Icon(Icons.airplanemode_active, color: colors.icon),
+  //                       const SizedBox(width: 8),
+  //                       Expanded(
+  //                         child: Text(
+  //                           data['destination'] ?? '',
+  //                           style: TextStyle(
+  //                             fontWeight: FontWeight.bold,
+  //                             fontSize: 18,
+  //                             color: colors.text,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                       if (!isCompleted)
+  //                         Container(
+  //                           padding: const EdgeInsets.symmetric(
+  //                             horizontal: 10,
+  //                             vertical: 4,
+  //                           ),
+  //                           decoration: BoxDecoration(
+  //                             color: colors.primary.withOpacity(0.1),
+  //                             borderRadius: BorderRadius.circular(12),
+  //                           ),
+  //                           child: Text(
+  //                             _getCountdownText(startDate),
+  //                             style: TextStyle(
+  //                               fontSize: 12,
+  //                               color: colors.primary,
+  //                             ),
+  //                           ),
+  //                         ),
+  //                     ],
+  //                   ),
+  //                   const SizedBox(height: 10),
+  //                   Row(
+  //                     children: [
+  //                       Icon(
+  //                         Icons.calendar_today,
+  //                         size: 16,
+  //                         color: colors.icon,
+  //                       ),
+  //                       const SizedBox(width: 6),
+  //                       Text(
+  //                         '${DateFormat('MMM d').format(startDate)} - ${DateFormat('MMM d, yyyy').format(endDate)}',
+  //                         style: TextStyle(color: colors.text.withOpacity(0.8)),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   const SizedBox(height: 6),
+  //                   Row(
+  //                     children: [
+  //                       Icon(
+  //                         Icons.currency_rupee,
+  //                         size: 16,
+  //                         color: colors.icon,
+  //                       ),
+  //                       const SizedBox(width: 6),
+  //                       Text(
+  //                         '₹${data['budget']}',
+  //                         style: TextStyle(color: colors.text.withOpacity(0.8)),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   const SizedBox(height: 6),
+  //                   Row(
+  //                     children: [
+  //                       Icon(Icons.people, size: 16, color: colors.icon),
+  //                       const SizedBox(width: 6),
+  //                       Text(
+  //                         '${data['people']} people',
+  //                         style: TextStyle(color: colors.text.withOpacity(0.8)),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   if (isEditable)
+  //                     Row(
+  //                       mainAxisAlignment: MainAxisAlignment.end,
+  //                       children: [
+  //                         IconButton(
+  //                           icon: Icon(Icons.edit, color: colors.primary),
+  //                           onPressed: () {
+  //                             Navigator.push(
+  //                               context,
+  //                               MaterialPageRoute(
+  //                                 builder:
+  //                                     (_) => TripEditScreen(
+  //                                       tripId: doc.id,
+  //                                       trip: data,
+  //                                     ),
+  //                               ),
+  //                             );
+  //                           },
+  //                         ),
+  //                         IconButton(
+  //                           icon: Icon(
+  //                             Icons.delete,
+  //                             color: Colors.red.shade400,
+  //                           ),
+  //                           onPressed: () => _confirmDelete(context, doc.id),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {

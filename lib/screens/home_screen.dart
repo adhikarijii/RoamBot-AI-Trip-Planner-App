@@ -12,6 +12,7 @@ import 'package:roambot/screens/profile_screen.dart';
 import 'package:roambot/screens/trip_creation_screen.dart';
 import 'package:roambot/screens/my_trips_screen.dart';
 import 'package:roambot/screens/trip_details_screen.dart';
+import 'package:animations/animations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -83,27 +84,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         );
       },
     );
-    // customConfirmationBox.show(
-    //   context: context,
-    //   text: 'Are you sure you want to log out?',
-    //   onPressedYes: () async {
-    //     Navigator.of(context).pop();
-    //     await FirebaseAuth.instance.signOut();
-    //     if (!mounted) return;
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       SnackBar(
-    //         content: const Text('Logged out successfully'),
-    //         behavior: SnackBarBehavior.floating,
-    //         shape: RoundedRectangleBorder(
-    //           borderRadius: BorderRadius.circular(10),
-    //         ),
-    //       ),
-    //     );
-    //     Navigator.of(
-    //       context,
-    //     ).pushNamedAndRemoveUntil('/login', (route) => false);
-    //   },
-    // );
   }
 
   void _logout(BuildContext context) async {
@@ -249,20 +229,28 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             // Notice Card with enhanced glass effect
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: _buildGlassCard(
-                child: InkWell(
-                  child: NoticeCard(),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => UpcomingTripsScreen()),
-                    );
-                  },
+              child: OpenContainer(
+                transitionDuration: const Duration(milliseconds: 600),
+                transitionType: ContainerTransitionType.fadeThrough,
+                closedElevation: 0,
+                closedColor: Colors.transparent,
+                openBuilder: (context, _) => UpcomingTripsScreen(),
+                closedShape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                colors: colors,
-                blurSigma: 12,
+                closedBuilder: (context, openContainer) {
+                  return _buildGlassCard(
+                    colors: colors,
+                    blurSigma: 12,
+                    child: GestureDetector(
+                      onTap: openContainer,
+                      child: NoticeCard(),
+                    ),
+                  );
+                },
               ),
             ),
+
             const SizedBox(height: 24),
             // Quick Actions with enhanced glass effect
             Padding(
@@ -283,19 +271,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const TripCreationScreen()),
-              );
-            },
-            backgroundColor: colors.primary.withOpacity(0.9),
-            foregroundColor: colors.onPrimary,
-            child: const Icon(Icons.add),
-          )
-          .animate(controller: _animationController)
-          .shake(hz: 0.5, curve: Curves.easeInOut),
+      floatingActionButton: OpenContainer(
+        transitionDuration: const Duration(milliseconds: 600),
+        transitionType: ContainerTransitionType.fadeThrough,
+        closedElevation: 6,
+        closedShape: const CircleBorder(),
+        closedColor: colors.primary.withOpacity(0.9),
+        openBuilder: (context, _) => const TripCreationScreen(),
+        closedBuilder: (context, openContainer) {
+          return FloatingActionButton(
+                onPressed: openContainer,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                child: const Icon(Icons.add, color: Colors.white),
+              )
+              .animate(controller: _animationController)
+              .shake(hz: 0.5, curve: Curves.easeInOut);
+        },
+      ),
     );
   }
 
@@ -363,36 +356,45 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             Row(
               children: [
                 Expanded(
-                  child: _buildGlassActionButton(
-                    context,
-                    icon: Icons.flight_takeoff,
-                    label: 'New Trip',
-                    onTap: () {
-                      Navigator.push(
+                  child: OpenContainer(
+                    transitionDuration: const Duration(milliseconds: 500),
+                    closedElevation: 0,
+                    closedColor: Colors.transparent,
+                    closedShape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    openBuilder: (context, _) => const TripCreationScreen(),
+                    closedBuilder: (context, openContainer) {
+                      return _buildGlassActionButton(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => const TripCreationScreen(),
-                        ),
+                        icon: Icons.flight_takeoff,
+                        label: 'New Trip',
+                        onTap:
+                            openContainer, // use openContainer instead of Navigator
+                        colors: colors,
                       );
                     },
-                    colors: colors,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _buildGlassActionButton(
-                    context,
-                    icon: Icons.map,
-                    label: 'My Trips',
-                    onTap: () {
-                      Navigator.push(
+                  child: OpenContainer(
+                    transitionDuration: const Duration(milliseconds: 500),
+                    closedElevation: 0,
+                    closedColor: Colors.transparent,
+                    closedShape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    openBuilder: (context, _) => const MyTripsScreen(),
+                    closedBuilder: (context, openContainer) {
+                      return _buildGlassActionButton(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => const MyTripsScreen(),
-                        ),
+                        icon: Icons.map,
+                        label: 'My Trips',
+                        onTap: openContainer,
+                        colors: colors,
                       );
                     },
-                    colors: colors,
                   ),
                 ),
               ],
@@ -401,36 +403,44 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             Row(
               children: [
                 Expanded(
-                  child: _buildGlassActionButton(
-                    context,
-                    icon: Icons.explore,
-                    label: 'Tour Packages',
-                    onTap: () {
-                      Navigator.push(
+                  child: OpenContainer(
+                    transitionDuration: const Duration(milliseconds: 500),
+                    closedElevation: 0,
+                    closedColor: Colors.transparent,
+                    closedShape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    openBuilder: (context, _) => UpcomingTripsScreen(),
+                    closedBuilder: (context, openContainer) {
+                      return _buildGlassActionButton(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => UpcomingTripsScreen(),
-                        ),
+                        icon: Icons.explore,
+                        label: 'Tour Packages',
+                        onTap: openContainer,
+                        colors: colors,
                       );
                     },
-                    colors: colors,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _buildGlassActionButton(
-                    context,
-                    icon: Icons.favorite,
-                    label: 'Popular Itineraries',
-                    onTap: () {
-                      Navigator.push(
+                  child: OpenContainer(
+                    transitionDuration: const Duration(milliseconds: 500),
+                    closedElevation: 0,
+                    closedColor: Colors.transparent,
+                    closedShape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    openBuilder: (context, _) => PopularItinerariesScreen(),
+                    closedBuilder: (context, openContainer) {
+                      return _buildGlassActionButton(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => PopularItinerariesScreen(),
-                        ),
+                        icon: Icons.favorite,
+                        label: 'Popular Itineraries',
+                        onTap: openContainer,
+                        colors: colors,
                       );
                     },
-                    colors: colors,
                   ),
                 ),
               ],
@@ -439,17 +449,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             Row(
               children: [
                 Expanded(
-                  child: _buildGlassActionButton(
-                    context,
-                    icon: Icons.auto_fix_high,
-                    label: "Customized Itinerary",
-                    onTap: () {
-                      Navigator.push(
+                  child: OpenContainer(
+                    transitionDuration: const Duration(milliseconds: 500),
+                    closedElevation: 0,
+                    closedColor: Colors.transparent,
+                    closedShape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    openBuilder: (context, _) => DetailItinerary(),
+                    closedBuilder: (context, openContainer) {
+                      return _buildGlassActionButton(
                         context,
-                        MaterialPageRoute(builder: (_) => DetailItinerary()),
+                        icon: Icons.auto_fix_high,
+                        label: 'Customized Itinerary',
+                        onTap: openContainer,
+                        colors: colors,
                       );
                     },
-                    colors: colors,
                   ),
                 ),
               ],
@@ -677,38 +693,47 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 const SizedBox(height: 12),
                 ...trips.map((trip) {
                   final data = trip.data() as Map<String, dynamic>;
-                  return ListTile(
-                    title: Text(
-                      data['destination'] ?? 'Unknown',
-                      style: TextStyle(color: colors.text),
+                  return OpenContainer(
+                    transitionDuration: const Duration(milliseconds: 500),
+                    transitionType:
+                        ContainerTransitionType
+                            .fadeThrough, // Or .fade, .fadeScale
+                    closedElevation: 0,
+                    closedShape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${_formatDate(data['startDate'])} - ${_formatDate(data['endDate'])}',
-                          style: TextStyle(color: colors.text.withOpacity(0.6)),
+                    closedColor: Colors.transparent,
+                    openBuilder: (context, _) => TripDetailsScreen(trip: data),
+                    closedBuilder: (context, openContainer) {
+                      return ListTile(
+                        onTap: openContainer,
+                        title: Text(
+                          data['destination'] ?? 'Unknown',
+                          style: TextStyle(color: colors.text),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _getCountdownString(data['startDate']),
-                          style: TextStyle(
-                            color: colors.primary.withOpacity(0.9),
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12,
-                          ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${_formatDate(data['startDate'])} - ${_formatDate(data['endDate'])}',
+                              style: TextStyle(
+                                color: colors.text.withOpacity(0.6),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _getCountdownString(data['startDate']),
+                              style: TextStyle(
+                                color: colors.primary.withOpacity(0.9),
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-
-                    trailing: Icon(Icons.chevron_right, color: colors.icon),
-                    onTap:
-                        () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => TripDetailsScreen(trip: data),
-                          ),
-                        ),
+                        trailing: Icon(Icons.chevron_right, color: colors.icon),
+                      );
+                    },
                   );
                 }),
               ],

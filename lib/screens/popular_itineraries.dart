@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:roambot/commons/widgets/custom_app_bar.dart';
 import 'popular_itinerary_detail_screen.dart';
+import 'package:animations/animations.dart';
 
 class PopularItinerariesScreen extends StatelessWidget {
   final List<Map<String, dynamic>> popularTrips = [
@@ -193,49 +194,61 @@ class PopularItinerariesScreen extends StatelessWidget {
         itemCount: popularTrips.length,
         itemBuilder: (context, index) {
           final trip = popularTrips[index];
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => PopularItineraryDetailScreen(trip: trip),
-                ),
-              );
-            },
-            child: Card(
-              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              shape: RoundedRectangleBorder(
+          return Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: OpenContainer(
+              transitionDuration: const Duration(milliseconds: 600),
+              transitionType: ContainerTransitionType.fadeThrough,
+              closedElevation: 4,
+              openColor: glassColors.background,
+              closedColor: glassColors.appBar,
+              closedShape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              elevation: 4,
-              color: glassColors.appBar,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(12),
-                    ),
-                    child: Image.asset(
-                      trip['imageAsset'],
-                      height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      trip['title'],
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: glassColors.text,
+              openBuilder:
+                  (context, _) => PopularItineraryDetailScreen(trip: trip),
+              closedBuilder:
+                  (context, openContainer) => GestureDetector(
+                    onTap: openContainer,
+                    child: Card(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                      color: Colors.transparent,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(12),
+                            ),
+                            child: Image.asset(
+                              trip['imageAsset'],
+                              height: 200,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(
+                              trip['title'],
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: glassColors.text,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ],
-              ),
             ),
           );
         },

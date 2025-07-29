@@ -95,7 +95,7 @@ class LandingScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Lottie.asset(
-                      'assets/animation/animation4.json',
+                      'assets/animation/Tourists by car.json',
                       height: 300,
                       fit: BoxFit.contain,
                     ),
