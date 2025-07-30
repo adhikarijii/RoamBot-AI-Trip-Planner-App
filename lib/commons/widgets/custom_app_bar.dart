@@ -1,7 +1,9 @@
 import 'dart:ui';
 
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:roambot/screens/landing_screen.dart';
 import 'package:roambot/screens/login_screen.dart';
 import 'package:roambot/screens/profile_screen.dart';
 
@@ -25,6 +27,8 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _CustomAppBarState extends State<CustomAppBar> {
+  bool _isNavigating = false;
+
   Widget _buildGlassCard({
     required Widget child,
     required GlassColors colors,
@@ -65,29 +69,90 @@ class _CustomAppBarState extends State<CustomAppBar> {
   }
 
   void _showLogoutConfirmation(BuildContext context) {
-    showDialog(
+    final colors = GlassColors.dark();
+
+    showGeneralDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Icon(Icons.logout, size: 40, color: Colors.red),
-          content: const Text(
-            'Are you sure you want to log out?',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16),
+      barrierDismissible: true,
+      barrierLabel: "Logout",
+      barrierColor: Colors.black.withOpacity(0.3),
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Center(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+            child: Dialog(
+              backgroundColor: colors.glassButton.withOpacity(0.8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: colors.glassBorder.withOpacity(0.3)),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 24,
+                  horizontal: 20,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.logout, size: 48, color: colors.icon),
+                    const SizedBox(height: 16),
+                    Text(
+                      "Log out?",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: colors.text,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "Are you sure you want to log out?",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: colors.text.withOpacity(0.7)),
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colors.background,
+                            foregroundColor: colors.text,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text("Cancel"),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent.withOpacity(0.8),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            _logout(context);
+                          },
+                          child: const Text("Log out"),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _logout(context);
-              },
-              child: const Text('Logout', style: TextStyle(color: Colors.red)),
-            ),
-          ],
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+          child: child,
         );
       },
     );
@@ -100,13 +165,13 @@ class _CustomAppBarState extends State<CustomAppBar> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Logged out successfully")));
-      Navigator.of(
-        context,
-      ).pushReplacement(MaterialPageRoute(builder: (_) => const LoginScreen()));
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const LandingScreen()),
+      );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Logout failed. Please try again.")),
+        const SnackBar(content: Text("Log out failed. Please try again.")),
       );
     }
   }
@@ -126,19 +191,27 @@ class _CustomAppBarState extends State<CustomAppBar> {
         style: const TextStyle(color: Colors.white),
       ),
       actions: [
-        GestureDetector(
-          onTap: () => _openProfile(context),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              backgroundImage:
-                  widget.profileImageUrl != null
-                      ? NetworkImage(widget.profileImageUrl!)
-                      : const AssetImage('assets/default_avatar.png')
-                          as ImageProvider,
-            ),
-          ),
-        ),
+        // OpenContainer(
+        //   transitionType: ContainerTransitionType.fadeThrough,
+        //   transitionDuration: const Duration(milliseconds: 500),
+        //   closedElevation: 0,
+        //   openElevation: 0,
+        //   closedColor: Colors.transparent,
+        //   openColor: Colors.transparent,
+        //   closedShape: const CircleBorder(),
+        //   openBuilder: (context, _) => const ProfileScreen(),
+        //   closedBuilder:
+        //       (context, openContainer) => Padding(
+        //         padding: const EdgeInsets.all(8.0),
+        //         child: CircleAvatar(
+        //           backgroundImage:
+        //               widget.profileImageUrl != null
+        //                   ? NetworkImage(widget.profileImageUrl!)
+        //                   : const AssetImage('assets/default_avatar.png')
+        //                       as ImageProvider,
+        //         ),
+        //       ),
+        // ),
         IconButton(
           icon: const Icon(Icons.logout),
           onPressed: () => _showLogoutConfirmation(context),
