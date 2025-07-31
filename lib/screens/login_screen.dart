@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'signup_screen.dart';
 import 'package:roambot/utils/constants.dart';
 import 'package:roambot/screens/auth_gate.dart';
+import 'package:animations/animations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -152,6 +153,23 @@ class _LoginScreenState extends State<LoginScreen> {
       prefixIcon: Icon(icon),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    );
+  }
+
+  Route _sharedAxisRoute() {
+    return PageRouteBuilder(
+      transitionDuration: const Duration(milliseconds: 600),
+      pageBuilder:
+          (context, animation, secondaryAnimation) => const LoginScreen(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return SharedAxisTransition(
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          transitionType:
+              SharedAxisTransitionType.horizontal, // or .vertical / .scaled
+          child: child,
+        );
+      },
     );
   }
 

@@ -1,11 +1,8 @@
 import 'dart:ui';
 
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:roambot/screens/landing_screen.dart';
-import 'package:roambot/screens/login_screen.dart';
-import 'package:roambot/screens/profile_screen.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
@@ -27,47 +24,6 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _CustomAppBarState extends State<CustomAppBar> {
-  bool _isNavigating = false;
-
-  Widget _buildGlassCard({
-    required Widget child,
-    required GlassColors colors,
-    double blurSigma = 10,
-  }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                colors.glassStart.withOpacity(0.7),
-                colors.glassEnd.withOpacity(0.4),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: colors.glassBorder.withOpacity(0.15),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: colors.shadow.withOpacity(0.2),
-                blurRadius: 20,
-                spreadRadius: -5,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: child,
-        ),
-      ),
-    );
-  }
-
   void _showLogoutConfirmation(BuildContext context) {
     final colors = GlassColors.dark();
 
@@ -174,13 +130,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
         const SnackBar(content: Text("Log out failed. Please try again.")),
       );
     }
-  }
-
-  void _openProfile(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const ProfileScreen()),
-    );
   }
 
   @override
