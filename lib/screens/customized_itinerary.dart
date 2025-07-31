@@ -409,6 +409,7 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
   }
 
   Future<void> _saveTrip() async {
+    final colors = GlassColors.dark();
     try {
       await FirebaseFirestore.instance.collection('trips').add({
         'userId': currentUserId,
@@ -423,26 +424,87 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
       });
 
       if (mounted) {
-        showDialog(
+        showGeneralDialog(
           context: context,
-          barrierDismissible: false,
-          builder:
-              (ctx) => AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                title: const Text('Success'),
-                content: const Text('Trip has been saved successfully!'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(ctx).pop();
-                      Navigator.of(context).pop(); // Pop TripCreationScreen
-                    },
-                    child: const Text('OK'),
+          barrierDismissible: true,
+          barrierLabel: "Success",
+          barrierColor: Colors.black.withOpacity(0.3),
+          transitionDuration: const Duration(milliseconds: 300),
+          pageBuilder: (context, animation, secondaryAnimation) {
+            return Center(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                child: Dialog(
+                  backgroundColor: colors.glassButton.withOpacity(0.8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(
+                      color: colors.glassBorder.withOpacity(0.3),
+                    ),
                   ),
-                ],
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 24,
+                      horizontal: 20,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "Trip has been saved successfully!",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: colors.text.withOpacity(0.7)),
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: colors.background,
+                                foregroundColor: colors.text,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: const Text("OK"),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
+            );
+          },
+          transitionBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+              opacity: CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOut,
+              ),
+              child: child,
+            );
+          },
+          // builder:
+          //     (ctx) => AlertDialog(
+          //       shape: RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.circular(16),
+          //       ),
+          //       title: const Text('Success'),
+          //       content: const Text('Trip has been saved successfully!'),
+          //       actions: [
+          //         TextButton(
+          //           onPressed: () {
+          //             Navigator.of(ctx).pop();
+          //             Navigator.of(context).pop(); // Pop TripCreationScreen
+          //           },
+          //           child: const Text('OK'),
+          //         ),
+          //       ],
+          //     ),
         );
       }
     } catch (e) {

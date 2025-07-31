@@ -403,6 +403,7 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
   }
 
   Future<void> _saveTrip() async {
+    final colors = GlassColors.dark();
     try {
       await FirebaseFirestore.instance.collection('trips').add({
         'userId': currentUserId,
@@ -416,26 +417,87 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
       });
 
       if (mounted) {
-        showDialog(
+        showGeneralDialog(
           context: context,
-          barrierDismissible: false,
-          builder:
-              (ctx) => AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                title: const Text('Success'),
-                content: const Text('Trip has been saved successfully!'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(ctx).pop();
-                      Navigator.of(context).pop(); // Pop TripCreationScreen
-                    },
-                    child: const Text('OK'),
+          barrierDismissible: true,
+          barrierLabel: "Success",
+          barrierColor: Colors.black.withOpacity(0.3),
+          transitionDuration: const Duration(milliseconds: 300),
+          pageBuilder: (context, animation, secondaryAnimation) {
+            return Center(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                child: Dialog(
+                  backgroundColor: colors.glassButton.withOpacity(0.8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(
+                      color: colors.glassBorder.withOpacity(0.3),
+                    ),
                   ),
-                ],
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 24,
+                      horizontal: 20,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "Trip has been saved successfully!",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: colors.text.withOpacity(0.7)),
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: colors.background,
+                                foregroundColor: colors.text,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: const Text("OK"),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
+            );
+          },
+          transitionBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+              opacity: CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOut,
+              ),
+              child: child,
+            );
+          },
+          // builder:
+          //     (ctx) => AlertDialog(
+          //       shape: RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.circular(16),
+          //       ),
+          //       title: const Text('Success'),
+          //       content: const Text('Trip has been saved successfully!'),
+          //       actions: [
+          //         TextButton(
+          //           onPressed: () {
+          //             Navigator.of(ctx).pop();
+          //             Navigator.of(context).pop(); // Pop TripCreationScreen
+          //           },
+          //           child: const Text('OK'),
+          //         ),
+          //       ],
+          //     ),
         );
       }
     } catch (e) {
@@ -921,9 +983,9 @@ class DestinationSearchField extends StatefulWidget {
   final Function(String) onSelected;
 
   const DestinationSearchField({
-    super.key,
     required this.controller,
     required this.onSelected,
+    super.key,
   });
 
   @override
@@ -935,22 +997,41 @@ class _DestinationSearchFieldState extends State<DestinationSearchField> {
   List<String> _suggestions = [];
   OverlayEntry? _overlayEntry;
 
-  void _onTextChanged(String query) async {
-    if (query.isEmpty) {
-      _removeOverlay();
-      return;
-    }
-
-    final results = await fetchGeoNamesCities(query);
-    setState(() {
-      _suggestions = results;
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(() {
+      final text = widget.controller.text.trim();
+      if (text.isEmpty) {
+        _removeOverlay();
+      } else {
+        _onTextChanged(text);
+      }
     });
-    _showOverlay();
+  }
+
+  @override
+  void dispose() {
+    _removeOverlay();
+    widget.controller.removeListener(() {});
+    super.dispose();
+  }
+
+  void _onTextChanged(String query) async {
+    final results = await fetchGeoNamesCities(query);
+    if (!mounted) return;
+
+    if (results.isEmpty) {
+      _removeOverlay();
+    } else {
+      _suggestions = results;
+      _showOverlay();
+    }
   }
 
   void _showOverlay() {
-    _removeOverlay();
-    final overlay = Overlay.of(context);
+    _removeOverlay(); // remove existing
+
     final renderBox = context.findRenderObject() as RenderBox;
     final size = renderBox.size;
     final offset = renderBox.localToGlobal(Offset.zero);
@@ -959,32 +1040,46 @@ class _DestinationSearchFieldState extends State<DestinationSearchField> {
       builder:
           (_) => Positioned(
             left: offset.dx,
-            top: offset.dy + size.height,
+            top: offset.dy + size.height + 5,
             width: size.width,
             child: Material(
-              elevation: 4,
-              child: ListView(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                children:
-                    _suggestions
-                        .map(
-                          (s) => ListTile(
-                            title: Text(s),
-                            onTap: () {
-                              widget.controller.text = s;
-                              widget.onSelected(s);
-                              _removeOverlay();
-                            },
-                          ),
-                        )
-                        .toList(),
+              color: Colors.transparent,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.white.withOpacity(0.2)),
+                    ),
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      children:
+                          _suggestions.map((suggestion) {
+                            return ListTile(
+                              title: Text(
+                                suggestion,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              onTap: () {
+                                widget.controller.text = suggestion;
+                                widget.onSelected(suggestion);
+                                _removeOverlay();
+                              },
+                            );
+                          }).toList(),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
     );
 
-    overlay.insert(_overlayEntry!);
+    Overlay.of(context).insert(_overlayEntry!);
   }
 
   void _removeOverlay() {
@@ -993,23 +1088,33 @@ class _DestinationSearchFieldState extends State<DestinationSearchField> {
   }
 
   @override
-  void dispose() {
-    _focusNode.dispose();
-    _removeOverlay();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: widget.controller,
       focusNode: _focusNode,
-      style: TextStyle(color: Colors.white), // <-- Input text color
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: 'Destination',
-        labelStyle: TextStyle(color: Color(0xFF2CE0D0)), // Label text color
+        labelStyle: const TextStyle(color: Color(0xFF2CE0D0)),
         prefixIcon: Icon(Icons.location_on, color: const Color(0xFF2CE0D0)),
+        suffixIcon: IconButton(
+          icon: const Icon(Icons.clear, color: Colors.white70),
+          onPressed: () {
+            widget.controller.clear();
+            _removeOverlay();
+          },
+        ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.white24),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color.fromARGB(255, 15, 103, 96)),
+        ),
+        // fillColor: Colors.white.withOpacity(0.05),
+        // filled: true,
       ),
       validator:
           (value) =>
@@ -1018,6 +1123,138 @@ class _DestinationSearchFieldState extends State<DestinationSearchField> {
     );
   }
 }
+
+// class DestinationSearchField extends StatefulWidget {
+//   final TextEditingController controller;
+//   final Function(String) onSelected;
+
+//   const DestinationSearchField({
+//     required this.controller,
+//     required this.onSelected,
+//     Key? key,
+//   }) : super(key: key);
+
+//   @override
+//   State<DestinationSearchField> createState() => _DestinationSearchFieldState();
+// }
+
+// class _DestinationSearchFieldState extends State<DestinationSearchField> {
+//   final FocusNode _focusNode = FocusNode();
+//   List<String> _suggestions = [];
+//   OverlayEntry? _overlayEntry;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     widget.controller.addListener(() {
+//       _onTextChanged(widget.controller.text);
+//     });
+//   }
+
+//   @override
+//   void dispose() {
+//     _removeOverlay();
+//     widget.controller.removeListener(() {
+//       _onTextChanged(widget.controller.text);
+//     });
+//     super.dispose();
+//   }
+
+//   void _onTextChanged(String query) async {
+//     query = query.trim();
+
+//     if (query.isEmpty) {
+//       _removeOverlay();
+//       return;
+//     }
+
+//     final results = await fetchGeoNamesCities(query);
+//     if (!mounted) return;
+
+//     if (results.isEmpty) {
+//       _removeOverlay();
+//     } else {
+//       setState(() {
+//         _suggestions = results;
+//       });
+//       _showOverlay();
+//     }
+//   }
+
+//   void _showOverlay() {
+//     _removeOverlay(); // Always remove existing one first
+
+//     if (_suggestions.isEmpty) return;
+
+//     final overlay = Overlay.of(context);
+//     final renderBox = context.findRenderObject() as RenderBox;
+//     final size = renderBox.size;
+//     final offset = renderBox.localToGlobal(Offset.zero);
+
+//     _overlayEntry = OverlayEntry(
+//       builder:
+//           (_) => Positioned(
+//             left: offset.dx,
+//             top: offset.dy + size.height + 5,
+//             width: size.width,
+//             child: Material(
+//               color: Colors.white,
+//               elevation: 6,
+//               child: ListView(
+//                 padding: EdgeInsets.zero,
+//                 shrinkWrap: true,
+//                 children:
+//                     _suggestions
+//                         .map(
+//                           (s) => ListTile(
+//                             title: Text(s),
+//                             onTap: () {
+//                               widget.controller.text = s;
+//                               widget.onSelected(s);
+//                               _removeOverlay();
+//                             },
+//                           ),
+//                         )
+//                         .toList(),
+//               ),
+//             ),
+//           ),
+//     );
+
+//     overlay.insert(_overlayEntry!);
+//   }
+
+//   void _removeOverlay() {
+//     _overlayEntry?.remove();
+//     _overlayEntry = null;
+//   }
+
+//   // @override
+//   // void dispose() {
+//   //   _focusNode.dispose();
+//   //   _removeOverlay();
+//   //   super.dispose();
+//   // }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return TextFormField(
+//       controller: widget.controller,
+//       focusNode: _focusNode,
+//       style: TextStyle(color: Colors.white), // <-- Input text color
+//       decoration: InputDecoration(
+//         labelText: 'Destination',
+//         labelStyle: TextStyle(color: Color(0xFF2CE0D0)), // Label text color
+//         prefixIcon: Icon(Icons.location_on, color: const Color(0xFF2CE0D0)),
+//         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+//       ),
+//       validator:
+//           (value) =>
+//               value == null || value.isEmpty ? 'Enter destination' : null,
+//       onChanged: _onTextChanged,
+//     );
+//   }
+// }
 
 class GlassColors {
   final Color background;
