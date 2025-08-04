@@ -332,17 +332,17 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
                               ),
                               Row(
                                 children: [
-                                  IconButton(
-                                    onPressed: () => _shareItinerary(itinerary),
-                                    icon: Icon(Icons.share, color: colors.icon),
-                                    tooltip: 'Share Itinerary',
-                                  ),
-                                  IconButton(
-                                    onPressed: () => _printItinerary(itinerary),
-                                    icon: Icon(Icons.print, color: colors.icon),
-                                    tooltip: 'Print Itinerary',
-                                  ),
-                                  const SizedBox(width: 5),
+                                  // IconButton(
+                                  //   onPressed: () => _shareItinerary(itinerary),
+                                  //   icon: Icon(Icons.share, color: colors.icon),
+                                  //   tooltip: 'Share Itinerary',
+                                  // ),
+                                  // IconButton(
+                                  //   onPressed: () => _printItinerary(itinerary),
+                                  //   icon: Icon(Icons.print, color: colors.icon),
+                                  //   tooltip: 'Print Itinerary',
+                                  // ),
+                                  // const SizedBox(width: 5),
                                   FilledButton(
                                     onPressed: () {
                                       Navigator.pop(context);
@@ -942,6 +942,118 @@ Future<List<String>> fetchGeoNamesCities(String query) async {
   }
 }
 
+// class DestinationSearchField extends StatefulWidget {
+//   final TextEditingController controller;
+//   final Function(String) onSelected;
+//   final String labeltext;
+
+//   const DestinationSearchField({
+//     super.key,
+//     required this.controller,
+//     required this.onSelected,
+//     required this.labeltext,
+//   });
+
+//   @override
+//   State<DestinationSearchField> createState() => _DestinationSearchFieldState();
+// }
+
+// class _DestinationSearchFieldState extends State<DestinationSearchField> {
+//   final FocusNode _focusNode = FocusNode();
+//   List<String> _suggestions = [];
+//   OverlayEntry? _overlayEntry;
+
+// void _onTextChanged(String query) async {
+//   if (query.trim().isEmpty) {
+//     _removeOverlay(); // remove dropdown if field is cleared
+//     return;
+//   }
+
+//   final results = await fetchGeoNamesCities(query);
+//   if (!mounted) return;
+
+//   if (results.isEmpty) {
+//     _removeOverlay();
+//   } else {
+//     _suggestions = results;
+//     _showOverlay();
+//   }
+// }
+
+//   void _showOverlay() {
+//     _removeOverlay();
+//     final overlay = Overlay.of(context);
+//     final renderBox = context.findRenderObject() as RenderBox;
+//     final size = renderBox.size;
+//     final offset = renderBox.localToGlobal(Offset.zero);
+
+//     _overlayEntry = OverlayEntry(
+//       builder:
+//           (_) => Positioned(
+//             left: offset.dx,
+//             top: offset.dy + size.height,
+//             width: size.width,
+//             child: Material(
+//               elevation: 4,
+//               child: ListView(
+//                 padding: EdgeInsets.zero,
+//                 shrinkWrap: true,
+//                 children:
+//                     _suggestions
+//                         .map(
+//                           (s) => ListTile(
+//                             title: Text(s),
+//                             onTap: () {
+//                               widget.controller.text = s;
+//                               widget.onSelected(s);
+//                               _removeOverlay();
+//                             },
+//                           ),
+//                         )
+//                         .toList(),
+//               ),
+//             ),
+//           ),
+//     );
+
+//     overlay.insert(_overlayEntry!);
+//   }
+
+//   void _removeOverlay() {
+//     _overlayEntry?.remove();
+//     _overlayEntry = null;
+//   }
+
+//   @override
+//   void dispose() {
+//     _focusNode.dispose();
+//     _removeOverlay();
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return TextFormField(
+//       controller: widget.controller,
+//       focusNode: _focusNode,
+//       style: TextStyle(color: Colors.white), // <-- Input text color
+//       decoration: InputDecoration(
+//         labelText: widget.labeltext, // ← uses externally provided label
+//         labelStyle: TextStyle(color: Color(0xFF2CE0D0)), // Label text color
+//         prefixIcon: const Icon(
+//           Icons.location_on,
+//           color: const Color(0xFF2CE0D0),
+//         ),
+//         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+//       ),
+//       validator:
+//           (value) =>
+//               value == null || value.isEmpty ? 'Enter destination' : null,
+//       onChanged: _onTextChanged,
+//     );
+//   }
+// }
+
 class DestinationSearchField extends StatefulWidget {
   final TextEditingController controller;
   final Function(String) onSelected;
@@ -963,6 +1075,27 @@ class _DestinationSearchFieldState extends State<DestinationSearchField> {
   List<String> _suggestions = [];
   OverlayEntry? _overlayEntry;
 
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(() {
+      final text = widget.controller.text.trim();
+      if (text.isEmpty) {
+        _removeOverlay();
+      } else {
+        _onTextChanged(text);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _removeOverlay();
+    widget.controller.removeListener(() {});
+    super.dispose();
+  }
+
   void _onTextChanged(String query) async {
     if (query.isEmpty) {
       _removeOverlay();
@@ -970,10 +1103,16 @@ class _DestinationSearchFieldState extends State<DestinationSearchField> {
     }
 
     final results = await fetchGeoNamesCities(query);
-    setState(() {
-      _suggestions = results;
-    });
-    _showOverlay();
+    if (!mounted) return;
+
+    if (results.isEmpty) {
+      _removeOverlay();
+    } else {
+      setState(() {
+        _suggestions = results;
+      });
+      _showOverlay();
+    }
   }
 
   void _showOverlay() {
@@ -987,26 +1126,42 @@ class _DestinationSearchFieldState extends State<DestinationSearchField> {
       builder:
           (_) => Positioned(
             left: offset.dx,
-            top: offset.dy + size.height,
+            top: offset.dy + size.height + 5,
             width: size.width,
             child: Material(
-              elevation: 4,
-              child: ListView(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                children:
-                    _suggestions
-                        .map(
-                          (s) => ListTile(
-                            title: Text(s),
-                            onTap: () {
-                              widget.controller.text = s;
-                              widget.onSelected(s);
-                              _removeOverlay();
-                            },
-                          ),
-                        )
-                        .toList(),
+              color: Colors.transparent,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.white.withOpacity(0.2)),
+                    ),
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      children:
+                          _suggestions
+                              .map(
+                                (s) => ListTile(
+                                  title: Text(
+                                    s,
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  onTap: () {
+                                    widget.controller.text = s;
+                                    widget.onSelected(s);
+                                    _removeOverlay();
+                                  },
+                                ),
+                              )
+                              .toList(),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -1021,26 +1176,31 @@ class _DestinationSearchFieldState extends State<DestinationSearchField> {
   }
 
   @override
-  void dispose() {
-    _focusNode.dispose();
-    _removeOverlay();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: widget.controller,
       focusNode: _focusNode,
-      style: TextStyle(color: Colors.white), // <-- Input text color
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
-        labelText: widget.labeltext, // ← uses externally provided label
-        labelStyle: TextStyle(color: Color(0xFF2CE0D0)), // Label text color
-        prefixIcon: const Icon(
-          Icons.location_on,
-          color: const Color(0xFF2CE0D0),
+        labelText: widget.labeltext,
+        labelStyle: const TextStyle(color: Color(0xFF2CE0D0)),
+        prefixIcon: const Icon(Icons.location_on, color: Color(0xFF2CE0D0)),
+        suffixIcon: IconButton(
+          icon: const Icon(Icons.clear, color: Colors.white70),
+          onPressed: () {
+            widget.controller.clear();
+            _removeOverlay();
+          },
         ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.white24),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color.fromARGB(255, 15, 103, 96)),
+        ),
       ),
       validator:
           (value) =>

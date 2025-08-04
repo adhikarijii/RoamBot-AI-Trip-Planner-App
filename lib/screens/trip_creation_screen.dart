@@ -326,17 +326,17 @@ STRUCTURE THE RESPONSE AS FOLLOWS:
                               ),
                               Row(
                                 children: [
-                                  IconButton(
-                                    onPressed: () => _shareItinerary(itinerary),
-                                    icon: Icon(Icons.share, color: colors.icon),
-                                    tooltip: 'Share Itinerary',
-                                  ),
-                                  IconButton(
-                                    onPressed: () => _printItinerary(itinerary),
-                                    icon: Icon(Icons.print, color: colors.icon),
-                                    tooltip: 'Print Itinerary',
-                                  ),
-                                  const SizedBox(width: 5),
+                                  // IconButton(
+                                  //   onPressed: () => _shareItinerary(itinerary),
+                                  //   icon: Icon(Icons.share, color: colors.icon),
+                                  //   tooltip: 'Share Itinerary',
+                                  // ),
+                                  // IconButton(
+                                  //   onPressed: () => _printItinerary(itinerary),
+                                  //   icon: Icon(Icons.print, color: colors.icon),
+                                  //   tooltip: 'Print Itinerary',
+                                  // ),
+                                  // const SizedBox(width: 5),
                                   FilledButton(
                                     onPressed: () {
                                       Navigator.pop(context);
