@@ -74,6 +74,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
+    final trimmedName = _nameController.text.trim();
+
+    // ❌ Check for empty or whitespace-only name
+    if (trimmedName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Name cannot be empty or just spaces."),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isSaving = true);
 
     String? imageUrl = _photoUrl;
@@ -81,17 +94,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       if (_pickedImage != null) {
         final ref = FirebaseStorage.instance.ref('profile_photos/$uid.jpg');
-
-        // ✅ Upload file and wait for completion
-        final uploadTask = await ref.putFile(_pickedImage!);
-
-        // ✅ Now get the download URL
+        await ref.putFile(_pickedImage!);
         imageUrl = await ref.getDownloadURL();
       }
 
-      // ✅ Save profile info to Firestore
       await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        'name': _nameController.text.trim(),
+        'name': trimmedName,
         'photoUrl': imageUrl,
       });
 
@@ -112,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ).showSnackBar(SnackBar(content: Text("Failed to save profile: $e")));
     }
 
-    FocusScope.of(context).unfocus(); // Prevent black screen
+    FocusScope.of(context).unfocus(); // Prevent keyboard flicker
   }
 
   Future<void> _pickImage() async {
@@ -124,45 +132,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Widget _buildGlassCard({
-    required Widget child,
-    required GlassColors colors,
-    double blurSigma = 10,
-  }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                colors.glassStart.withOpacity(0.7),
-                colors.glassEnd.withOpacity(0.4),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: colors.glassBorder.withOpacity(0.15),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: colors.shadow.withOpacity(0.2),
-                blurRadius: 20,
-                spreadRadius: -5,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: child,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final colors = GlassColors.dark();
@@ -172,7 +141,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ? FileImage(_pickedImage!)
             : _photoUrl != null
             ? NetworkImage(_photoUrl!)
-            : const AssetImage('assets/default_avatar.png') as ImageProvider;
+            : const AssetImage('assets/roambot_splash with bg.png')
+                as ImageProvider;
 
     return Scaffold(
       backgroundColor: colors.background,

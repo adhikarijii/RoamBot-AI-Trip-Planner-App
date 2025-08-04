@@ -209,7 +209,7 @@ class UserProfileScreen extends StatelessWidget {
                                     photoUrl != null
                                         ? NetworkImage(photoUrl)
                                         : const AssetImage(
-                                              'assets/default_avatar.png',
+                                              'assets/roambot_splash with bg.png',
                                             )
                                             as ImageProvider,
                               ),

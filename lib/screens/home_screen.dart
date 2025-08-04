@@ -207,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           backgroundImage:
               (photoUrl != null && photoUrl.isNotEmpty)
                   ? NetworkImage(photoUrl)
-                  : const AssetImage('assets/default_avatar.png')
+                  : const AssetImage('assets/roambot_splash with bg.png')
                       as ImageProvider,
         );
       },
