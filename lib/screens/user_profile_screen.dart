@@ -6,6 +6,7 @@ import 'package:roambot/commons/widgets/custom_app_bar.dart';
 import 'package:roambot/screens/About.dart';
 import 'package:roambot/screens/PrivacyPolicy.dart';
 import 'package:roambot/screens/TermsOfUse.dart';
+import 'package:roambot/screens/feedback_screen.dart';
 import 'package:roambot/screens/landing_screen.dart';
 import 'package:roambot/screens/login_screen.dart';
 import 'package:roambot/screens/profile_screen.dart';
@@ -290,6 +291,14 @@ class UserProfileScreen extends StatelessWidget {
           const PrivacyPolicy(),
           colors,
         ),
+        const SizedBox(height: 10),
+        _buildTile(
+          Icons.feedback_outlined,
+          "Feedback",
+          const FeedbackScreen(),
+          colors,
+        ),
+
         const SizedBox(height: 10),
 
         _buildTile(Icons.logout_outlined, "Log out", () {
