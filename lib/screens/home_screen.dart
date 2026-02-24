@@ -59,8 +59,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _showLogoutConfirmation(BuildContext context) {
-    final colors = GlassColors.dark(); // Or `.light()` if using light mode
-
+    final colors = GlassColors.dark();
     showGeneralDialog(
       context: context,
       barrierDismissible: true,

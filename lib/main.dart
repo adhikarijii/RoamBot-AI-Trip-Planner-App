@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart'; // Add this import
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:roambot/commons/widgets/custom_splash_screen.dart';
 import 'firebase_options.dart';
 import 'screens/auth_gate.dart';
